@@ -8,6 +8,8 @@ Resource\NAnt\nant.xsd" default="integrate">
 	<property name="TestDirectory" value="Build\Test"/>
 	<property name="LibDirectory" value="Build\Lib"/>
 	<property name="SolutionFile" value="Autofac.sln" readonly="true"/>
+	<property name="AutofacCsproj" value="Source\Autofac\Autofac.csproj" readonly="true"/>
+	<property name="DotNet2AssemblyName" value="Autofac.DotNet2" readonly="true"/>
 	<property name="DistribFileName" value="${project::get-name()}"/>
 	<property name="Version" value="1.0.0.0" />
 	<property name="AllowPartiallyTrustedCallers" value="false"/>
@@ -49,6 +51,13 @@ Integration targets
 			<property name="Configuration" value="${ProjectConfig}"/>
 		</msbuild>
 	</target>
+  <target name="dotnet2-build">
+    <msbuild project="${AutofacCsproj}">
+      <property name="AssemblyName" value="${DotNet2AssemblyName}"/>
+      <property name="TargetFrameworkVersion" value="v2.0"/>
+      <property name="Configuration" value="Release"/>
+    </msbuild>
+  </target>
 	<target name="post-build">
 		<move file="Source/_VersionAssemblyInfo.cs" tofile="Source/VersionAssemblyInfo.cs" overwrite="true" failonerror="false" if="${file::exists('Source/_VersionAssemblyInfo.cs')}"/>
 	</target>
@@ -99,6 +108,7 @@ Composite targets
 		<trycatch>
 			<try>
 				<call target="main-build"/>
+        <call target="dotnet2-build"/>
 			</try>
 			<finally>
 				<call target="post-build"/>

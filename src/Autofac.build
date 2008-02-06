@@ -10,10 +10,13 @@ Resource\NAnt\nant.xsd" default="integrate">
 	<property name="SolutionFile" value="Autofac.sln" readonly="true"/>
 	<property name="AutofacCsproj" value="Source\Autofac\Autofac.csproj" readonly="true"/>
 	<property name="DotNet2AssemblyName" value="Autofac.DotNet2" readonly="true"/>
-	<property name="DistribFileName" value="${project::get-name()}"/>
-	<property name="Version" value="1.0.0.0" />
+  <property name="NUnitDirectory" value="Resource\NUnit"/>
+  <property name="LinqBridgeDirectory" value="Resource\LinqBridge"/>
+  <property name="Version" value="1.0.0.0" />
 	<property name="AllowPartiallyTrustedCallers" value="false"/>
-	<!-- 
+  <property name="DistribFileName" value="autofac-${Version}"/>
+  <property name="DistribDotNet2FileName" value="autofac-dotnet2-${Version}"/>
+  <!-- 
 Integration targets
 -->
 	<target name="clean">
@@ -78,18 +81,37 @@ Integration targets
 	</target>
 	<target name="distrib">
 		<mkdir dir="${DistribDirectory}"/>
-		<zip zipfile="${DistribDirectory}\${DistribFileName}.zip" ziplevel="9">
-			<fileset basedir="${LibDirectory}" prefix="bin">
-				<include name="Autofac.*"/>
-			</fileset>
-			<fileset basedir="${TestDirectory}" prefix="test">
-				<include name="*.*"/>
-			</fileset>
-			<fileset>
-				<include name="license.txt"/>
-			</fileset>
-		</zip>
-	</target>
+    <zip zipfile="${DistribDirectory}\${DistribFileName}.zip" ziplevel="9">
+      <fileset basedir="${LibDirectory}" prefix="bin">
+        <include name="Autofac.*"/>
+        <exclude name="Autofac.DotNet2.*"/>
+      </fileset>
+      <fileset basedir="${TestDirectory}" prefix="test">
+        <include name="*.*"/>
+      </fileset>
+      <fileset>
+        <include name="Autofac License.txt"/>
+      </fileset>
+      <fileset basedir="${NUnitDirectory}">
+        <include name="NUnit License.txt"/>
+      </fileset>
+    </zip>
+    <zip zipfile="${DistribDirectory}\${DistribDotNet2FileName}.zip" ziplevel="9">
+      <fileset basedir="${LibDirectory}" prefix="bin">
+        <include name="Autofac.DotNet2.*"/>
+        <include name="LinqBridge.*"/>
+      </fileset>
+      <fileset>
+        <include name="Autofac License.txt"/>
+      </fileset>
+      <fileset basedir="${NUnitDirectory}">
+        <include name="NUnit License.txt"/>
+      </fileset>
+      <fileset basedir="${LinqBridgeDirectory}">
+        <include name="LinqBridge License.txt"/>
+      </fileset>
+    </zip>
+  </target>
 	<target name="test">
 		<nunit2>
 			<formatter type="Xml" usefile="true" extension=".xml" outputdir="${ArtifactDirectory}"/>

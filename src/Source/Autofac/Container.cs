@@ -380,6 +380,22 @@ namespace Autofac
         /// <summary>
         /// Retrieve a service registered with the container.
         /// </summary>
+        /// <typeparam name="TService">The type to which the result will be cast.</typeparam>
+        /// <param name="serviceName">Name of the service.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>
+        /// The component instance that provides the service.
+        /// </returns>
+        /// <exception cref="ComponentNotRegisteredException"/>
+        /// <exception cref="DependencyResolutionException"/>
+        public TService Resolve<TService>(string serviceName, params Parameter[] parameters)
+        {
+            return CreateResolutionContext().Resolve<TService>(serviceName, parameters);
+        }
+
+        /// <summary>
+        /// Retrieve a service registered with the container.
+        /// </summary>
         /// <param name="serviceType">The service to retrieve.</param>
         /// <param name="parameters"></param>
         /// <returns>

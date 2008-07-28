@@ -19,6 +19,8 @@ namespace Autofac
 
         event EventHandler<ComponentRegisteredEventArgs> Registered;
 
+        void AddRegistrationSource(IRegistrationSource source);
+
         void AddDynamicRegistrationSource(IRegistrationSource source);
     }
 }

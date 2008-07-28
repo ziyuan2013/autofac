@@ -32,6 +32,11 @@ namespace Autofac
             get { return _componentRegistry; }
         }
 
+        public IDisposer Disposer
+        {
+            get { return _rootLifetimeScope.Disposer; }
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

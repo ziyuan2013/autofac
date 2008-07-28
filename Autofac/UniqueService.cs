@@ -28,47 +28,22 @@ using System;
 namespace Autofac
 {
     /// <summary>
-    /// Services are the lookup keys used to locate component instances.
+    /// A handy unique service identifier type - all instances will be regarded as unequal.
     /// </summary>
-    public abstract class Service
+    public class UniqueService : Service
     {
-        /// <summary>
-        /// Gets a human-readable description of the service.
-        /// </summary>
-        /// <value>The description.</value>
-        public abstract string Description { get; }
+        Guid _id = Guid.NewGuid();
 
         /// <summary>
-        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+        /// Provides a programmer-readable description of the identifying feature of the service.
         /// </summary>
-        /// <returns>
-        /// A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
-        /// </returns>
-        public override string ToString()
+        /// <value></value>
+        public override string Description
         {
-            return Description;
-        }
-
-        /// <summary>
-        /// Implements the operator ==.
-        /// </summary>
-        /// <param name="lhs">The LHS.</param>
-        /// <param name="rhs">The RHS.</param>
-        /// <returns>The result of the operator.</returns>
-        public static bool operator ==(Service lhs, Service rhs)
-        {
-            return object.Equals(lhs, rhs);
-        }
-
-        /// <summary>
-        /// Implements the operator !=.
-        /// </summary>
-        /// <param name="lhs">The LHS.</param>
-        /// <param name="rhs">The RHS.</param>
-        /// <returns>The result of the operator.</returns>
-        public static bool operator !=(Service lhs, Service rhs)
-        {
-            return !(lhs == rhs);
+            get
+            {
+                return _id.ToString();
+            }
         }
 
         /// <summary>
@@ -81,8 +56,9 @@ namespace Autofac
         /// <exception cref="T:System.NullReferenceException">The <paramref name="obj"/> parameter is null.</exception>
         public override bool Equals(object obj)
         {
-            throw new NotImplementedException(
-                "Subclasses of Autofac.Service must override Object.Equals()");
+            UniqueService that = obj as UniqueService;
+
+            return that != null && _id == that._id;
         }
 
         /// <summary>
@@ -93,8 +69,7 @@ namespace Autofac
         /// </returns>
         public override int GetHashCode()
         {
-            throw new NotImplementedException(
-                "Subclasses of Autofac.Service must override Object.GetHashCode()");
+            return _id.GetHashCode();
         }
     }
 }

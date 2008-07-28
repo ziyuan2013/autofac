@@ -26,15 +26,23 @@
 using System;
 using System.Collections.Generic;
 using Autofac.Internal;
+using Autofac.Activators;
 
-namespace Autofac.Standard
+namespace Autofac.RegistrationSources
 {
     /// <summary>
     /// This class provides a common base for registration handlers that provide
     /// reflection-based registrations.
     /// </summary>
-    public abstract class RegistrationSource : IRegistrationSource
+    public abstract class MultipleUseRegistrationSource : IRegistrationSource
     {
+        IRegistrationData _registrationData;
+
+        public MultipleUseRegistrationSource(IRegistrationData registrationData)
+        {
+            _registrationData = Enforce.ArgumentNotNull(registrationData, "registrationData");
+        }
+        
         /// <summary>
         /// Retrieve a registration for an unregistered service, to be used
         /// by the container.
@@ -49,22 +57,18 @@ namespace Autofac.Standard
 
             Type concrete;
             IEnumerable<Service> services;
-            if (!TryGetImplementation(service, out concrete, out services))
+            if (!TryGetImplementation(service, _registrationData.Services, out concrete, out services))
                 return false;
 
-            //var descriptor = new Descriptor(
-            //        new UniqueService(),
-            //        services,
-            //        concrete);
+            registration = new ComponentRegistration(
+                Guid.NewGuid(),
+                new ReflectionActivator(concrete),
+                _registrationData.Lifetime,
+                _registrationData.Sharing,
+                _registrationData.Ownership,
+                services,
+                _registrationData.ExtendedProperties);
 
-            //var activator = new ReflectionActivator(
-            //        concrete,
-            //        ActivationParameters.Empty,
-            //        ActivationParameters.Empty,
-            //        _constructorSelector);
-
-            //registration = CreateRegistration(descriptor, activator);
-            registration = null;
             return true;
         }
 
@@ -76,6 +80,6 @@ namespace Autofac.Standard
         /// <param name="implementor">The implementation type.</param>
         /// <param name="services">The services.</param>
         /// <returns>True if a registration can be made.</returns>
-        protected abstract bool TryGetImplementation(Service service, out Type implementor, out IEnumerable<Service> services);
+        protected abstract bool TryGetImplementation(Service service, IEnumerable<Service> configuredServices, out Type implementor, out IEnumerable<Service> services);
     }
 }

@@ -14,7 +14,5 @@ namespace Autofac
         bool TryGetSharedInstance(Guid id, out object result);
 
         void AddSharedInstance(Guid id, object newInstance);
-
-        IDisposer Disposer { get; }
     }
 }

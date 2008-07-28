@@ -42,6 +42,11 @@ namespace Autofac
             get { throw new NotImplementedException(); }
         }
 
+        public void AddRegistrationSource(IRegistrationSource source)
+        {
+            throw new NotImplementedException();
+        }
+
         public void AddDynamicRegistrationSource(IRegistrationSource source)
         {
             throw new NotImplementedException();

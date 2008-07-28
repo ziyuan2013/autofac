@@ -47,9 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuilderExtensions.cs" />
+    <Compile Include="Activators\ProvidedInstanceActivator.cs" />
+    <Compile Include="Activators\ReflectionActivator.cs" />
+    <Compile Include="BuilderSyntaxExtensions.cs" />
     <Compile Include="ComponentActivation.cs" />
     <Compile Include="ComponentRegisteredEventArgs.cs" />
+    <Compile Include="ComponentRegistration.cs" />
     <Compile Include="Disposer.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="IDisposer.cs" />
@@ -75,14 +78,26 @@
     </Compile>
     <Compile Include="IRegistrationSource.cs" />
     <Compile Include="MatchingScopeLifetime.cs" />
+    <Compile Include="NamedService.cs" />
     <Compile Include="Parameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Syntax\ConcreteRegistrar.cs" />
+    <Compile Include="RegistrationSources\ConcreteRegistrationData.cs" />
+    <Compile Include="Syntax\IConcreteRegistrar.cs" />
+    <Compile Include="Syntax\IRegistrar.cs" />
+    <Compile Include="Syntax\Registrar.cs" />
+    <Compile Include="RegistrationSources\RegistrationData.cs" />
+    <Compile Include="RegistrationSources\IConcreteRegistrationData.cs" />
+    <Compile Include="RegistrationSources\IRegistrationData.cs" />
+    <Compile Include="RegistrationSources\SingleUseRegistrationSource.cs" />
     <Compile Include="ResolveOperation.cs" />
     <Compile Include="LifetimeScope.cs" />
     <Compile Include="RootScopeLifetime.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="Standard\Module.cs" />
-    <Compile Include="Standard\RegistrationSource.cs" />
+    <Compile Include="RegistrationSources\MultipleUseRegistrationSource.cs" />
+    <Compile Include="TypedService.cs" />
+    <Compile Include="UniqueService.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Internal\EnforceResources.resx">
@@ -90,6 +105,9 @@
       <LastGenOutput>EnforceResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Registrars\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

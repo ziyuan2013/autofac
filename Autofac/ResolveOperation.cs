@@ -72,10 +72,7 @@ namespace Autofac
 
         void ResetSuccessfulActivations()
         {
-            if (_successfulActivations.Any())
-                throw new InvalidOperationException();
-
-            _successfulActivations = new LinkedList<ComponentActivation>();
+            _successfulActivations = new List<ComponentActivation>();
         }
 
         public IComponentRegistry ComponentRegistry

@@ -7,8 +7,8 @@ namespace Autofac.RegistrationSources
 {
     public class ConcreteRegistrationData : RegistrationData, IRegistrationData, IConcreteRegistrationData
     {
-        public Guid Id { get; protected set; }
+        public virtual Guid Id { get; protected set; }
 
-        public IInstanceActivator Activator { get; protected set;  }
+        public virtual IInstanceActivator Activator { get; protected set; }
     }
 }

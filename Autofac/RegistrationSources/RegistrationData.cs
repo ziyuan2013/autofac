@@ -7,14 +7,14 @@ namespace Autofac.RegistrationSources
 {
     public class RegistrationData : IRegistrationData
     {
-        public ICollection<Service> Services { get; protected set; }
+        public virtual ICollection<Service> Services { get; protected set; }
 
-        public InstanceOwnership Ownership { get; protected set; }
+        public virtual InstanceOwnership Ownership { get; protected set; }
 
-        public IComponentLifetime Lifetime { get; protected set; }
+        public virtual IComponentLifetime Lifetime { get; protected set; }
 
-        public InstanceSharing Sharing { get; protected set; }
+        public virtual InstanceSharing Sharing { get; protected set; }
 
-        public IDictionary<string, object> ExtendedProperties { get; protected set; }
+        public virtual IDictionary<string, object> ExtendedProperties { get; protected set; }
     }
 }

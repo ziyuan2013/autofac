@@ -25,6 +25,22 @@ namespace Autofac.Syntax
             Lifetime = new RootScopeLifetime();
             Sharing = InstanceSharing.Shared;
             Services = new HashSet<Service>();
+            ExtendedProperties = new Dictionary<string, object>();
+        }
+
+        public override ICollection<Service> Services
+        {
+            get
+            {
+                var result = base.Services;
+                if (!result.Any())
+                    result = new[] { _defaultService };
+                return result;
+            }
+            protected set
+            {
+                base.Services = value;
+            }
         }
 
         public IConcreteRegistrar<T> ExternallyOwned()

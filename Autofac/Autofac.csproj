@@ -53,6 +53,7 @@
     <Compile Include="ComponentActivation.cs" />
     <Compile Include="ComponentRegisteredEventArgs.cs" />
     <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="ContextResolveExtensions.cs" />
     <Compile Include="Disposer.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="IDisposer.cs" />
@@ -105,9 +106,6 @@
       <LastGenOutput>EnforceResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Registrars\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -25,7 +25,6 @@
 
 using System;
 using System.Collections.Generic;
-using Autofac.Internal;
 using Autofac.Activators;
 
 namespace Autofac.RegistrationSources
@@ -34,11 +33,11 @@ namespace Autofac.RegistrationSources
     /// This class provides a common base for registration handlers that provide
     /// reflection-based registrations.
     /// </summary>
-    public abstract class MultipleUseRegistrationSource : IRegistrationSource
+    public abstract class DynamicRegistrationSource : IRegistrationSource
     {
         IRegistrationData _registrationData;
 
-        public MultipleUseRegistrationSource(IRegistrationData registrationData)
+        public DynamicRegistrationSource(IRegistrationData registrationData)
         {
             _registrationData = Enforce.ArgumentNotNull(registrationData, "registrationData");
         }

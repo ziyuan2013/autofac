@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Autofac.Internal;
-using Autofac.Syntax;
-using Autofac.Activators;
+﻿using Autofac.Activators;
 using Autofac.RegistrationSources;
+using Autofac.Syntax;
 
 namespace Autofac
 {
-    public static class BuilderSyntaxExtensions
+    public static class RegistrationExtensions
     {
         public static void RegisterModule(this IContainer container, IModule module)
         {

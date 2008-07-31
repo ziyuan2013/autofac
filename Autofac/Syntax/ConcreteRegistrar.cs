@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Autofac.Internal;
 using Autofac.RegistrationSources;
 
 namespace Autofac.Syntax
@@ -17,15 +14,9 @@ namespace Autofac.Syntax
         }
 
         public ConcreteRegistrar(IInstanceActivator activator, Service defaultService)
+            : base(activator)
         {
             _defaultService = Enforce.ArgumentNotNull(defaultService, "defaultService");
-            Id = Guid.NewGuid();
-            Activator = Enforce.ArgumentNotNull(activator, "activator");
-            Ownership = InstanceOwnership.OwnedByLifetimeScope;
-            Lifetime = new RootScopeLifetime();
-            Sharing = InstanceSharing.Shared;
-            Services = new HashSet<Service>();
-            ExtendedProperties = new Dictionary<string, object>();
         }
 
         public override ICollection<Service> Services

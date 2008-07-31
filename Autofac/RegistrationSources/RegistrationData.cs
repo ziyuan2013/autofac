@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Autofac.RegistrationSources
 {
     public class RegistrationData : IRegistrationData
     {
+        public RegistrationData()
+        {
+            Ownership = InstanceOwnership.OwnedByLifetimeScope;
+            Lifetime = new RootScopeLifetime();
+            Sharing = InstanceSharing.Shared;
+            Services = new HashSet<Service>();
+            ExtendedProperties = new Dictionary<string, object>();
+        }
+
         public virtual ICollection<Service> Services { get; protected set; }
 
         public virtual InstanceOwnership Ownership { get; protected set; }

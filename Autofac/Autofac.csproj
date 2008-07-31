@@ -49,11 +49,11 @@
   <ItemGroup>
     <Compile Include="Activators\ProvidedInstanceActivator.cs" />
     <Compile Include="Activators\ReflectionActivator.cs" />
-    <Compile Include="BuilderSyntaxExtensions.cs" />
+    <Compile Include="RegistrationExtensions.cs" />
     <Compile Include="ComponentActivation.cs" />
     <Compile Include="ComponentRegisteredEventArgs.cs" />
     <Compile Include="ComponentRegistration.cs" />
-    <Compile Include="ContextResolveExtensions.cs" />
+    <Compile Include="ResolutionExtensions.cs" />
     <Compile Include="Disposer.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="IDisposer.cs" />
@@ -70,9 +70,9 @@
     <Compile Include="ILifetimeScope.cs" />
     <Compile Include="INestedLifetimeScope.cs" />
     <Compile Include="InstanceSharing.cs" />
-    <Compile Include="Internal\Disposable.cs" />
-    <Compile Include="Internal\Enforce.cs" />
-    <Compile Include="Internal\EnforceResources.Designer.cs">
+    <Compile Include="Disposable.cs" />
+    <Compile Include="Enforce.cs" />
+    <Compile Include="EnforceResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EnforceResources.resx</DependentUpon>
@@ -95,13 +95,13 @@
     <Compile Include="LifetimeScope.cs" />
     <Compile Include="RootScopeLifetime.cs" />
     <Compile Include="Service.cs" />
-    <Compile Include="Standard\Module.cs" />
-    <Compile Include="RegistrationSources\MultipleUseRegistrationSource.cs" />
+    <Compile Include="Module.cs" />
+    <Compile Include="RegistrationSources\DynamicRegistrationSource.cs" />
     <Compile Include="TypedService.cs" />
     <Compile Include="UniqueService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Internal\EnforceResources.resx">
+    <EmbeddedResource Include="EnforceResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>EnforceResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>

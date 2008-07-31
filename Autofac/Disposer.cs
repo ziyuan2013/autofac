@@ -25,7 +25,6 @@
 
 using System;
 using System.Collections.Generic;
-using Autofac.Internal;
 
 namespace Autofac
 {
@@ -33,7 +32,7 @@ namespace Autofac
     /// Maintains a set of objects to dispose, and disposes them in the reverse order
     /// from which they were added when the Disposer is itself disposed.
     /// </summary>
-    public class Disposer : Disposable, IDisposer
+    class Disposer : Disposable, IDisposer
     {
         /// <summary>
         /// Contents all implement IDisposable.

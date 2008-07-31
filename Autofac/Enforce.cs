@@ -26,7 +26,7 @@
 using System;
 using System.Globalization;
 
-namespace Autofac.Internal
+namespace Autofac
 {
     /// <summary>
     /// Helper methods used throughout the codebase.

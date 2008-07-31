@@ -23,9 +23,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-using Autofac.Internal;
 
-namespace Autofac.Standard
+namespace Autofac
 {
     /// <summary>
     /// Base class for user-defined modules. Implements IModule on top

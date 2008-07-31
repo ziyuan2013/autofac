@@ -24,7 +24,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 
-using Autofac.Internal;
+
 namespace Autofac
 {
     /// <summary>

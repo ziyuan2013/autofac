@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Autofac.Internal;
-using Autofac.Standard;
-using Autofac.RegistrationSources;
+﻿using Autofac.RegistrationSources;
 
 namespace Autofac.Syntax
 {
@@ -12,10 +6,6 @@ namespace Autofac.Syntax
     {
         public Registrar()
         {
-            Ownership = InstanceOwnership.OwnedByLifetimeScope;
-            Lifetime = new RootScopeLifetime();
-            Sharing = InstanceSharing.Shared;
-            Services = new HashSet<Service>();
         }
 
         public IRegistrar<T> ExternallyOwned()

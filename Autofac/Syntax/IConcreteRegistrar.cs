@@ -5,5 +5,8 @@ namespace Autofac.Syntax
     {
         IConcreteRegistrar<T> ExternallyOwned();
         IConcreteRegistrar<T> OwnedByLifetimeScope();
+        IConcreteRegistrar<T> UnsharedInstances();
+        IConcreteRegistrar<T> SingleInstance();
+        IConcreteRegistrar<T> InstancePer<TTag>(TTag lifetimeScopeTag);
     }
 }

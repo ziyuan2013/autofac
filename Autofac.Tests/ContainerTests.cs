@@ -127,27 +127,34 @@ namespace Autofac.Tests
             Assert.AreSame(instance, target.Resolve<object>());
         }
 
-        //[Test]
-        //public void ResolveUnregistered()
-        //{
-        //    try
-        //    {
-        //        var target = new Container();
-        //        target.Resolve<object>();
-        //    }
-        //    catch (ComponentNotRegisteredException se)
-        //    {
-        //        Assert.IsTrue(se.Message.Contains("System.Object"));
-        //        return;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Assert.Fail("Expected a ComponentNotRegisteredException, got {0}.", ex);
-        //        return;
-        //    }
+        [Test]
+        public void ResolveUnregistered()
+        {
+            try
+            {
+                var target = new Container();
+                target.Resolve<object>();
+            }
+            catch (ComponentNotRegisteredException se)
+            {
+                Assert.IsTrue(se.Message.Contains("System.Object"));
+                return;
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail("Expected a ComponentNotRegisteredException, got {0}.", ex);
+                return;
+            }
 
-        //    Assert.Fail("Expected a ComponentNotRegisteredException.");
-        //}
+            Assert.Fail("Expected a ComponentNotRegisteredException.");
+        }
+
+        [Test]
+        public void UnsharedComponentsProvideNewInstanceOnEveryResolve()
+        {
+            var container = new Container();
+            container.RegisterType<object>().UnsharedInstances();
+        }
 
         //[Test]
         //public void CircularDependency()

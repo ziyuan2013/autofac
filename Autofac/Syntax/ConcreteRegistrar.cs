@@ -45,5 +45,33 @@ namespace Autofac.Syntax
             Ownership = InstanceOwnership.OwnedByLifetimeScope;
             return this;
         }
+
+        public IConcreteRegistrar<T> UnsharedInstances()
+        {
+            Sharing = InstanceSharing.None;
+            Lifetime = new CurrentScopeLifetime();
+            return this;
+        }
+
+        public IConcreteRegistrar<T> SingleInstance()
+        {
+            Sharing = InstanceSharing.Shared;
+            Lifetime = new RootScopeLifetime();
+            return this;
+        }
+
+        public IConcreteRegistrar<T> InstancePerLifetimeScope()
+        {
+            Sharing = InstanceSharing.Shared;
+            Lifetime = new CurrentScopeLifetime();
+            return this;
+        }
+
+        public IConcreteRegistrar<T> InstancePer<TTag>(TTag lifetimeScopeTag)
+        {
+            Sharing = InstanceSharing.None;
+            Lifetime = new MatchingScopeLifetime(scope => false); // scope.Resolve<TagTracker>().IsTaggedWith(lifetimeScopeTag));
+            return this;
+        }
     }
 }

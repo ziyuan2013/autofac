@@ -51,7 +51,7 @@ namespace Autofac
             object instance;
             var successful = context.TryResolve(service, parameters, out instance);
             if (!successful)
-                throw new InvalidOperationException("Not registered..");
+                throw new ComponentNotRegisteredException(service);
             return instance;
         }
 

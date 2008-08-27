@@ -33,7 +33,7 @@ namespace Autofac.RegistrationSources
     /// This class provides a common base for registration handlers that provide
     /// reflection-based registrations.
     /// </summary>
-    public abstract class DynamicRegistrationSource : IRegistrationSource
+    public abstract class DynamicRegistrationSource : IDynamicRegistrationSource
     {
         IRegistrationData _registrationData;
 

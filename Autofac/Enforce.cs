@@ -24,7 +24,9 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Linq;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace Autofac
 {
@@ -39,8 +41,8 @@ namespace Autofac
         /// base initialiser syntax.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="name"></param>
+        /// <param name="value">The value.</param>
+        /// <param name="name">The name.</param>
         /// <returns><paramref name="value"/></returns>
         public static T ArgumentNotNull<T>(T value, string name)
             where T : class
@@ -50,6 +52,26 @@ namespace Autofac
 
             if (value == null)
                 throw new ArgumentNullException(name);
+
+            return value;
+        }
+
+        /// <summary>
+        /// Enforce that sequence does not contain null. Returns the
+        /// value if valid so that it can be used inline in
+        /// base initialiser syntax.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value">The value.</param>
+        /// <param name="name">The name.</param>
+        /// <returns><paramref name="value"/></returns>
+        public static IEnumerable<T> ArgumentElementNotNull<T>(IEnumerable<T> value, string name)
+            where T : class
+        {
+            Enforce.ArgumentNotNull(value, name);
+
+            if (value.Contains(null))
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, EnforceResources.ElementCannotBeNull, name));
 
             return value;
         }

@@ -1,7 +1,7 @@
 ﻿
 namespace Autofac
 {
-    public interface IRegistrationSource
+    public interface IDynamicRegistrationSource
     {
         bool TryGetRegistration(Service service, out IComponentRegistration registration);
     }

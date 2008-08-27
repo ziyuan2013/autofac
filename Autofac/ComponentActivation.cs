@@ -7,14 +7,14 @@ namespace Autofac
     {
         IComponentRegistration _registration;
         IComponentContext _context;
-        INestedLifetimeScope _mostNestedVisibleScope;
-        INestedLifetimeScope _activationScope;
+        ISharingLifetimeScope _mostNestedVisibleScope;
+        ISharingLifetimeScope _activationScope;
         object _newInstance;
 
         public ComponentActivation(
             IComponentRegistration registration,
             IComponentContext context,
-            INestedLifetimeScope mostNestedVisibleScope)
+            ISharingLifetimeScope mostNestedVisibleScope)
         {
             _registration = Enforce.ArgumentNotNull(registration, "registration");
             _context = Enforce.ArgumentNotNull(context, "context");
@@ -79,7 +79,7 @@ namespace Autofac
             }
         }
 
-        public INestedLifetimeScope ActivationScope
+        public ISharingLifetimeScope ActivationScope
         {
             get
             {

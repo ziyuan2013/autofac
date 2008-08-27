@@ -8,16 +8,16 @@ namespace Autofac
         IComponentRegistry _componentRegistry;
         Stack<ComponentActivation> _activationStack = new Stack<ComponentActivation>();
         ICollection<ComponentActivation> _successfulActivations;
-        INestedLifetimeScope _mostNestedLifetimeScope;
+        ISharingLifetimeScope _mostNestedLifetimeScope;
         
-        public ResolveOperation(INestedLifetimeScope mostNestedLifetimeScope, IComponentRegistry componentRegistry)
+        public ResolveOperation(ISharingLifetimeScope mostNestedLifetimeScope, IComponentRegistry componentRegistry)
         {
             _mostNestedLifetimeScope = Enforce.ArgumentNotNull(mostNestedLifetimeScope, "mostNestedLifetimeScope");
             _componentRegistry = Enforce.ArgumentNotNull(componentRegistry, "componentRegistry");
             ResetSuccessfulActivations();
         }
 
-        INestedLifetimeScope CurrentActivationScope
+        ISharingLifetimeScope CurrentActivationScope
         {
             get
             {

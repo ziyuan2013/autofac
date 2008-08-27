@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Autofac
-{
-
-
+namespace Autofac {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -75,6 +75,15 @@ namespace Autofac
         internal static string CannotBeNull {
             get {
                 return ResourceManager.GetString("CannotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The sequence provided as argument &apos;{0}&apos; cannot contain null elements..
+        /// </summary>
+        internal static string ElementCannotBeNull {
+            get {
+                return ResourceManager.GetString("ElementCannotBeNull", resourceCulture);
             }
         }
     }

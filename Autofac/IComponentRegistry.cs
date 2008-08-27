@@ -9,7 +9,7 @@ namespace Autofac
 
         bool IsRegistered(Service service);
 
-        void Register(IComponentRegistration registration, bool allowOverrides);
+        void Register(IComponentRegistration registration);
 
         IEnumerable<IComponentRegistration> GetRegistrationsProviding(Service service);
 
@@ -17,8 +17,8 @@ namespace Autofac
 
         event EventHandler<ComponentRegisteredEventArgs> Registered;
 
-        void AddRegistrationSource(IRegistrationSource source);
+        void AddDeferredRegistrationSource(IDeferredRegistrationSource source);
 
-        void AddDynamicRegistrationSource(IRegistrationSource source);
+        void AddDynamicRegistrationSource(IDynamicRegistrationSource source);
     }
 }

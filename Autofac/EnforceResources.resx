@@ -123,4 +123,7 @@
   <data name="CannotBeNull" xml:space="preserve">
     <value>The object of type '{0}' cannot be null.</value>
   </data>
+  <data name="ElementCannotBeNull" xml:space="preserve">
+    <value>The sequence provided as argument '{0}' cannot contain null elements.</value>
+  </data>
 </root>

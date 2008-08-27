@@ -7,7 +7,7 @@ namespace Autofac
     {
         object ActivateInstance(ILifetimeScope activationScope, IEnumerable<Parameter> parameters);
 
-        void CompleteActivation(object newInstance, INestedLifetimeScope activationScope);
+        void CompleteActivation(object newInstance, ISharingLifetimeScope activationScope);
 
         event EventHandler Preparing;
 

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Autofac
 {
-    public class LifetimeScope : Disposable, INestedLifetimeScope
+    public class LifetimeScope : Disposable, ISharingLifetimeScope
     {
         IComponentRegistry _componentRegistry;
-        INestedLifetimeScope _root; // Root optimises singleton lookup without traversal
-        INestedLifetimeScope _parent;
+        ISharingLifetimeScope _root; // Root optimises singleton lookup without traversal
+        ISharingLifetimeScope _parent;
         IDisposer _disposer = new Disposer();
         IDictionary<Guid, object> _sharedInstances = new Dictionary<Guid, object>();
 
@@ -35,12 +35,12 @@ namespace Autofac
             return operation.TryResolve(service, parameters, out instance);
         }
 
-        public INestedLifetimeScope ParentLifetimeScope
+        public ISharingLifetimeScope ParentLifetimeScope
         {
             get { return _parent; }
         }
 
-        public INestedLifetimeScope RootLifetimeScope
+        public ISharingLifetimeScope RootLifetimeScope
         {
             get { return _root; }
         }

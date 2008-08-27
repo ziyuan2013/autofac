@@ -3,14 +3,15 @@ using System.Collections.Generic;
 
 namespace Autofac.Activators
 {
-    public class ProvidedInstanceActivator : IInstanceActivator
+    public class ProvidedInstanceActivator : InstanceActivator, IInstanceActivator
     {
         object _instance;
         bool _activated;
 
         public ProvidedInstanceActivator(object instance)
+            : base(Enforce.ArgumentNotNull(instance, "instance").GetType())
         {
-            _instance = Enforce.ArgumentNotNull(instance, "instance");
+            _instance = instance;
         }
 
         public object ActivateInstance(ILifetimeScope activationScope, IEnumerable<Parameter> parameters)
@@ -24,21 +25,6 @@ namespace Autofac.Activators
             _activated = true;
 
             return _instance;
-        }
-
-        public void CompleteActivation(object newInstance, INestedLifetimeScope activationScope)
-        {
-        }
-
-        public event EventHandler Preparing;
-
-        public event EventHandler Activating;
-
-        public event EventHandler Activated;
-
-        public Type BestGuessImplementationType
-        {
-            get { return _instance.GetType(); }
         }
     }
 }

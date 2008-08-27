@@ -47,8 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activators\DelegateActivator.cs" />
+    <Compile Include="Activators\InstanceActivator.cs" />
     <Compile Include="Activators\ProvidedInstanceActivator.cs" />
     <Compile Include="Activators\ReflectionActivator.cs" />
+    <Compile Include="IDynamicRegistrationSource.cs" />
     <Compile Include="RegistrationExtensions.cs" />
     <Compile Include="ComponentActivation.cs" />
     <Compile Include="ComponentRegisteredEventArgs.cs" />
@@ -68,7 +71,7 @@
     <Compile Include="IComponentRegistration.cs" />
     <Compile Include="IComponentRegistry.cs" />
     <Compile Include="ILifetimeScope.cs" />
-    <Compile Include="INestedLifetimeScope.cs" />
+    <Compile Include="ISharingLifetimeScope.cs" />
     <Compile Include="InstanceSharing.cs" />
     <Compile Include="Disposable.cs" />
     <Compile Include="Enforce.cs" />
@@ -77,7 +80,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EnforceResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="IRegistrationSource.cs" />
+    <Compile Include="IDeferredRegistrationSource.cs" />
     <Compile Include="MatchingScopeLifetime.cs" />
     <Compile Include="NamedService.cs" />
     <Compile Include="Parameter.cs" />
@@ -90,7 +93,7 @@
     <Compile Include="RegistrationSources\RegistrationData.cs" />
     <Compile Include="RegistrationSources\IConcreteRegistrationData.cs" />
     <Compile Include="RegistrationSources\IRegistrationData.cs" />
-    <Compile Include="RegistrationSources\SingleUseRegistrationSource.cs" />
+    <Compile Include="RegistrationSources\DeferredRegistrationSource.cs" />
     <Compile Include="ResolveOperation.cs" />
     <Compile Include="LifetimeScope.cs" />
     <Compile Include="RootScopeLifetime.cs" />

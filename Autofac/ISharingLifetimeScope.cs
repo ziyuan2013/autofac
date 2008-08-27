@@ -2,11 +2,11 @@
 
 namespace Autofac
 {
-    public interface INestedLifetimeScope : ILifetimeScope
+    public interface ISharingLifetimeScope : ILifetimeScope
     {
-        INestedLifetimeScope RootLifetimeScope { get; }
+        ISharingLifetimeScope RootLifetimeScope { get; }
 
-        INestedLifetimeScope ParentLifetimeScope { get; }
+        ISharingLifetimeScope ParentLifetimeScope { get; }
 
         bool TryGetSharedInstance(Guid id, out object result);
 

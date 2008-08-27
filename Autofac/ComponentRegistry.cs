@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Autofac
 {
     class ComponentRegistry : Disposable, IComponentRegistry
     {
         ICollection<Service> _unregisteredServices = new HashSet<Service>();
-        ICollection<IRegistrationSource>
-            _registrationSources = new List<IRegistrationSource>(),
-            _dynamicRegistrationSources = new List<IRegistrationSource>();
+        ICollection<IDeferredRegistrationSource> _registrationSources = new List<IDeferredRegistrationSource>();
+        ICollection<IDynamicRegistrationSource> _dynamicRegistrationSources = new List<IDynamicRegistrationSource>();
         IDictionary<Service, IComponentRegistration> _defaultRegistrations = new Dictionary<Service, IComponentRegistration>();
+        ICollection<IComponentRegistration> _registrations = new List<IComponentRegistration>();
 
         public ComponentRegistry()
         {
-            Registrations = new List<IComponentRegistration>();
         }
 
         public bool IsRegistered(Service service)
@@ -24,11 +24,13 @@ namespace Autofac
             return TryGetRegistration(service, out unused);
         }
 
-        public event EventHandler<ComponentRegisteredEventArgs> Registered;
+        public event EventHandler<ComponentRegisteredEventArgs> Registered = (s, e) => { };
 
         public bool TryGetRegistration(Service service, out IComponentRegistration registration)
         {
             Enforce.ArgumentNotNull(service, "service");
+
+            DeferredInitialise();
 
             if (_defaultRegistrations.TryGetValue(service, out registration))
                 return true;
@@ -36,21 +38,11 @@ namespace Autofac
             if (_unregisteredServices.Contains(service))
                 return false;
 
-            foreach (var rs in _registrationSources)
-            {
-                if (rs.TryGetRegistration(service, out registration))
-                {
-                    _registrationSources.Remove(rs);
-                    Register(registration, false);
-                    return true;
-                }
-            }
-
             foreach (var rs in _dynamicRegistrationSources)
             {
                 if (rs.TryGetRegistration(service, out registration))
                 {
-                    Register(registration, false);
+                    Register(registration);
                     return true;
                 }
             }
@@ -59,11 +51,24 @@ namespace Autofac
             return false;
         }
 
-        public void Register(IComponentRegistration registration, bool allowOverrides)
+        private void DeferredInitialise()
+        {
+            var sources = _registrationSources;
+            _registrationSources = new List<IDeferredRegistrationSource>();
+            foreach (var rs in sources)
+            {
+                Register(rs.GetRegistration());
+            }
+        }
+
+        public void Register(IComponentRegistration registration)
         {
             Enforce.ArgumentNotNull(registration, "registration");
             foreach (var service in registration.Services)
-                _defaultRegistrations.Add(service, registration);
+            {
+                _defaultRegistrations[service] = registration;
+                _unregisteredServices.Remove(service);
+            }
         }
 
         public IEnumerable<IComponentRegistration> GetRegistrationsProviding(Service service)
@@ -71,22 +76,23 @@ namespace Autofac
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IComponentRegistration> Registrations { get; private set; }
+        public IEnumerable<IComponentRegistration> Registrations
+        {
+            get
+            {
+                DeferredInitialise();
+                return _registrations.ToList();
+            }
+        }
 
-        public void AddRegistrationSource(IRegistrationSource source)
+        public void AddDeferredRegistrationSource(IDeferredRegistrationSource source)
         {
             _registrationSources.Add(Enforce.ArgumentNotNull(source, "source"));
-            RegistrationSourcesChanged();
         }
 
-        public void AddDynamicRegistrationSource(IRegistrationSource source)
+        public void AddDynamicRegistrationSource(IDynamicRegistrationSource source)
         {
             _dynamicRegistrationSources.Add(Enforce.ArgumentNotNull(source, "source"));
-            RegistrationSourcesChanged();
-        }
-
-        void RegistrationSourcesChanged()
-        {
             _unregisteredServices.Clear();
         }
     }

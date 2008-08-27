@@ -20,7 +20,8 @@ namespace Autofac
             Lifetime = Enforce.ArgumentNotNull(lifetime, "lifetime");
             Sharing = sharing;
             Ownership = ownership;
-            Services = Enforce.ArgumentNotNull(services, "services").ToList();
+            Services = Enforce.ArgumentElementNotNull(
+                Enforce.ArgumentNotNull(services, "services"), "services").ToList();
             ExtendedProperties = new Dictionary<string, object>(
                 Enforce.ArgumentNotNull(extendedProperties, "extendedProperties"));
         }

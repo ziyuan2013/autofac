@@ -3,31 +3,22 @@ using System.Collections.Generic;
 
 namespace Autofac.Activators
 {
-    public class ReflectionActivator : IInstanceActivator
+    public class ReflectionActivator : InstanceActivator, IInstanceActivator
     {
+        Type _implementationType;
+
         public ReflectionActivator(Type implementationType)
+            : base(Enforce.ArgumentNotNull(implementationType, "implementationType"))
         {
+            _implementationType = implementationType;
         }
 
         public object ActivateInstance(ILifetimeScope activationScope, IEnumerable<Parameter> parameters)
         {
-            throw new NotImplementedException();
-        }
+            Enforce.ArgumentNotNull(activationScope, "activationScope");
+            Enforce.ArgumentNotNull(parameters, "parameters");
 
-        public void CompleteActivation(object newInstance, INestedLifetimeScope activationScope)
-        {
-            throw new NotImplementedException();
-        }
-
-        public event EventHandler Preparing;
-
-        public event EventHandler Activating;
-
-        public event EventHandler Activated;
-
-        public Type BestGuessImplementationType
-        {
-            get { throw new NotImplementedException(); }
+            return Activator.CreateInstance(_implementationType);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Autofac
             _matcher = Enforce.ArgumentNotNull(matcher, "matcher");
         }
 
-        public INestedLifetimeScope FindScope(INestedLifetimeScope mostNestedVisibleScope)
+        public ISharingLifetimeScope FindScope(ISharingLifetimeScope mostNestedVisibleScope)
         {
             Enforce.ArgumentNotNull(mostNestedVisibleScope, "mostNestedVisibleScope");
 

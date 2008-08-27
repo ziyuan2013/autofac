@@ -1,4 +1,7 @@
 ﻿using NUnit.Framework;
+using System;
+using Autofac.Activators;
+using System.Collections.Generic;
 
 namespace Autofac.Tests
 {
@@ -35,85 +38,94 @@ namespace Autofac.Tests
             Assert.IsTrue(container.IsRegistered<object>());
         }
 
-        //[Test]
-        //public void ReplaceInstance()
-        //{
-        //    var target = new Container();
+        [Test]
+        public void LastRegistrationForAServiceBecomesTheDefault()
+        {
+            var target = new Container();
 
-        //    var instance1 = new object();
-        //    var instance2 = new object();
+            var instance1 = new object();
+            var instance2 = new object();
 
-        //    target.RegisterComponent(CreateRegistration(
-        //        new[] { new TypedService(typeof(object)) },
-        //        new ProvidedInstanceActivator(instance1)));
+            target.RegisterInstance(instance1);
+            target.RegisterInstance(instance2);
 
-        //    target.RegisterComponent(CreateRegistration(
-        //        new[] { new TypedService(typeof(object)) },
-        //        new ProvidedInstanceActivator(instance2)));
+            Assert.AreSame(instance2, target.Resolve<object>());
+        }
 
-        //    Assert.AreSame(instance2, target.Resolve<object>());
-        //}
+        [Test]
+        public void CanRegisterComponentDirectly()
+        {
+            var registration = CreateRegistration(
+                new ProvidedInstanceActivator("Hello"),
+                new[] { new TypedService(typeof(object)), new TypedService(typeof(string)) });
 
-        //[Test]
-        //public void RegisterComponent()
-        //{
-        //    var registration = CreateRegistration(
-        //        new[] { new TypedService(typeof(object)), new TypedService(typeof(string)) },
-        //        new ProvidedInstanceActivator("Hello"),
-        //        new ContainerScope());
+            var target = new Container();
 
-        //    var target = new Container();
+            target.RegisterComponent(registration);
 
-        //    target.RegisterComponent(registration);
+            Assert.IsTrue(target.IsRegistered<object>());
+            Assert.IsTrue(target.IsRegistered<string>());
+        }
 
-        //    Assert.IsTrue(target.IsRegistered<object>());
-        //    Assert.IsTrue(target.IsRegistered<string>());
-        //}
+        private static ComponentRegistration CreateRegistration(IInstanceActivator activator, IEnumerable<Service> services)
+        {
+            var registration = new ComponentRegistration(
+                Guid.NewGuid(),
+                activator,
+                new RootScopeLifetime(),
+                InstanceSharing.Shared,
+                InstanceOwnership.OwnedByLifetimeScope,
+                services,
+                new Dictionary<string, object>());
+            return registration;
+        }
 
-        //[Test]
-        //[ExpectedException(typeof(ArgumentNullException))]
-        //public void RegisterComponentNull()
-        //{
-        //    var target = new Container();
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CannotRegisterNullAsAComponent()
+        {
+            var target = new Container();
 
-        //    target.RegisterComponent(null);
-        //}
+            target.RegisterComponent(null);
+        }
 
-        //[Test]
-        //[ExpectedException(typeof(ArgumentException))]
-        //public void RegisterComponentNullService()
-        //{
-        //    var registration = CreateRegistration(
-        //        new Service[] { new TypedService(typeof(object)), null },
-        //        new ProvidedInstanceActivator(new object()),
-        //        new ContainerScope());
+        [Test]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CannotRegisterNullAsAService()
+        {
+            var registration = CreateRegistration(
+                new ProvidedInstanceActivator(new object()),
+                new Service[] { new TypedService(typeof(object)), null });
+        }
 
-        //    var target = new Container();
+        [Test]
+        public void CanRegisterType()
+        {
+            var target = new Container();
+            target.RegisterType<object>();
+            var instance = target.Resolve<object>();
+            Assert.IsNotNull(instance);
+            Assert.IsInstanceOfType(typeof(object), instance);
+        }
 
-        //    target.RegisterComponent(registration);
-        //}
+        [Test]
+        public void CanRegisterTypeNonGenerically()
+        {
+            var target = new Container();
+            target.RegisterType(typeof(object));
+            var instance = target.Resolve<object>();
+            Assert.IsNotNull(instance);
+            Assert.IsInstanceOfType(typeof(object), instance);
+        }
 
-        //[Test]
-        //public void RegisterDelegate()
-        //{
-        //    object instance = new object();
-        //    var target = new Container();
-        //    target.RegisterComponent(CreateRegistration(
-        //        new[] { new TypedService(typeof(object)) },
-        //        new DelegateActivator((c, p) => instance)));
-        //    Assert.AreSame(instance, target.Resolve<object>());
-        //}
-
-        //[Test]
-        //public void RegisterType()
-        //{
-        //    var builder = new ContainerBuilder();
-        //    builder.Register<object>();
-        //    var target = builder.Build();
-        //    object instance = target.Resolve<object>();
-        //    Assert.IsNotNull(instance);
-        //    Assert.IsInstanceOfType(typeof(object), instance);
-        //}
+        [Test]
+        public void CanRegisterDelegate()
+        {
+            object instance = new object();
+            var target = new Container();
+            target.RegisterDelegate((c, p) => instance);
+            Assert.AreSame(instance, target.Resolve<object>());
+        }
 
         //[Test]
         //public void ResolveUnregistered()

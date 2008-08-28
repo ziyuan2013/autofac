@@ -23,39 +23,43 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 
-
-namespace Autofac
+namespace Autofac.Services
 {
     /// <summary>
-    /// Identifies a service using a textual name.
+    /// A handy unique service identifier type - all instances will be regarded as unequal.
     /// </summary>
-    public class NamedService : Service
+    public class UniqueService : Service
     {
-        /// <summary>
-        /// Gets or sets the name of the service.
-        /// </summary>
-        /// <value>The name of the service.</value>
-        string ServiceName { get; set; }
+        Guid _id;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NamedService"/> class.
+        /// Initializes a new instance of the <see cref="UniqueService"/> class.
         /// </summary>
-        /// <param name="serviceName">Name of the service.</param>
-        public NamedService(string serviceName)
+        public UniqueService()
+            : this(Guid.NewGuid())
         {
-            ServiceName = Enforce.ArgumentNotNullOrEmpty(serviceName, "serviceName");
         }
 
         /// <summary>
-        /// Gets a human-readable description of the service.
+        /// Initializes a new instance of the <see cref="UniqueService"/> class.
         /// </summary>
-        /// <value>The description.</value>
+        /// <param name="id">The id.</param>
+        public UniqueService(Guid id)
+        {
+            _id = id;
+        }
+
+        /// <summary>
+        /// Provides a programmer-readable description of the identifying feature of the service.
+        /// </summary>
+        /// <value></value>
         public override string Description
         {
             get
             {
-                return ServiceName;
+                return _id.ToString();
             }
         }
 
@@ -69,12 +73,9 @@ namespace Autofac
         /// <exception cref="T:System.NullReferenceException">The <paramref name="obj"/> parameter is null.</exception>
         public override bool Equals(object obj)
         {
-            NamedService that = obj as NamedService;
+            UniqueService that = obj as UniqueService;
 
-            if (that == null)
-                return false;
-
-            return ServiceName == that.ServiceName;
+            return that != null && _id == that._id;
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace Autofac
         /// </returns>
         public override int GetHashCode()
         {
-            return ServiceName.GetHashCode();
+            return _id.GetHashCode();
         }
     }
 }

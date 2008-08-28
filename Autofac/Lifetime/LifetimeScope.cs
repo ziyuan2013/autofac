@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Autofac.Resolving;
+using Autofac.Registry;
+using Autofac.Disposal;
+using Autofac.Services;
 
-namespace Autofac
+namespace Autofac.Lifetime
 {
     public class LifetimeScope : Disposable, ISharingLifetimeScope
     {
@@ -72,6 +76,14 @@ namespace Autofac
         public IComponentRegistry ComponentRegistry
         {
             get { return _componentRegistry; }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _disposer.Dispose();
+
+            base.Dispose(disposing);
         }
     }
 }

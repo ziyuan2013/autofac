@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using Autofac.Services;
 namespace Autofac.Syntax
 {
     public interface IConcreteRegistrar<T>

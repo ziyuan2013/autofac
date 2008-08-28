@@ -26,6 +26,8 @@
 using System;
 using System.Collections.Generic;
 using Autofac.Activators;
+using Autofac.Registry;
+using Autofac.Services;
 
 namespace Autofac.RegistrationSources
 {

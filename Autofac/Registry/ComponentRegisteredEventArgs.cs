@@ -25,7 +25,7 @@
 
 using System;
 
-namespace Autofac
+namespace Autofac.Registry
 {
     /// <summary>
     /// Information about the ocurrence of a component being registered

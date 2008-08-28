@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Autofac.Registry;
+using Autofac.Lifetime;
+using Autofac.Services;
+using Autofac.Disposal;
 
-namespace Autofac
+namespace Autofac.Resolving
 {
     class ComponentActivation
     {

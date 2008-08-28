@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Autofac
+namespace Autofac.Lifetime
 {
     public interface ISharingLifetimeScope : ILifetimeScope
     {

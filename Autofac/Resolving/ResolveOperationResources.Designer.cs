@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Autofac {
+namespace Autofac.Resolving {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Autofac {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Autofac.ResolveOperationResources", typeof(ResolveOperationResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Autofac.Resolving.ResolveOperationResources", typeof(ResolveOperationResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,15 +57,6 @@ namespace Autofac {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Circular component dependency detected: {0}..
-        /// </summary>
-        internal static string CircularDependency {
-            get {
-                return ResourceManager.GetString("CircularDependency", resourceCulture);
             }
         }
         

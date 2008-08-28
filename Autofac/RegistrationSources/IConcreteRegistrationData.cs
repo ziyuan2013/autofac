@@ -1,4 +1,5 @@
 ﻿using System;
+using Autofac.Activators;
 
 namespace Autofac.RegistrationSources
 {

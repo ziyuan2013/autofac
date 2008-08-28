@@ -1,5 +1,7 @@
-﻿
-namespace Autofac
+﻿using Autofac.Registry;
+using Autofac.Services;
+
+namespace Autofac.RegistrationSources
 {
     public interface IDynamicRegistrationSource
     {

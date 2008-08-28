@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Autofac.Registry;
+using Autofac.Disposal;
+using Autofac.Services;
+using Autofac.Lifetime;
 
 namespace Autofac
 {

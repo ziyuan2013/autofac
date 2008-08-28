@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autofac.RegistrationSources;
+using Autofac.Disposal;
+using Autofac.Services;
 
-namespace Autofac
+namespace Autofac.Registry
 {
     class ComponentRegistry : Disposable, IComponentRegistry
     {

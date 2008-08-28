@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Globalization;
 
-namespace Autofac
+namespace Autofac.Lifetime
 {
     public class MatchingScopeLifetime : IComponentLifetime
     {

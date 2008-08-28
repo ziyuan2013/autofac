@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Autofac
+namespace Autofac.Disposal
 {
     /// <summary>
     /// Base class for disposable objects.

@@ -1,11 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using Autofac.Services;
 
 namespace Autofac
 {
     public static class ResolutionExtensions
     {
         static readonly IEnumerable<Parameter> NoParameters = new Parameter[0];
+
+        public static T Resolve<T>(this IComponentContext context, Guid registrationId)
+        {
+            return Resolve<T>(context, registrationId, NoParameters);
+        }
+
+        public static T Resolve<T>(this IComponentContext context, Guid registrationId, IEnumerable<Parameter> parameters)
+        {
+            return (T)Resolve(context, new UniqueService(registrationId), parameters);
+        }
 
         public static T Resolve<T>(this IComponentContext context)
         {

@@ -1,5 +1,6 @@
-﻿
-namespace Autofac
+﻿using Autofac.Registry;
+
+namespace Autofac.RegistrationSources
 {
     public interface IDeferredRegistrationSource
     {

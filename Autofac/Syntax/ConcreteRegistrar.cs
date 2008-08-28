@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Autofac.RegistrationSources;
+using Autofac.Lifetime;
+using Autofac.Activators;
+using Autofac.Services;
+using Autofac.Disposal;
 
 namespace Autofac.Syntax
 {

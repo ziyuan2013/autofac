@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using Autofac.Disposal;
+using Autofac.Lifetime;
+using Autofac.Services;
 
 namespace Autofac.RegistrationSources
 {

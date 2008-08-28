@@ -1,12 +1,12 @@
 ﻿
-namespace Autofac
+namespace Autofac.Lifetime
 {
-    public class RootScopeLifetime : IComponentLifetime
+    public class CurrentScopeLifetime : IComponentLifetime
     {
         public ISharingLifetimeScope FindScope(ISharingLifetimeScope mostNestedVisibleScope)
         {
             Enforce.ArgumentNotNull(mostNestedVisibleScope, "mostNestedVisibleScope");
-            return mostNestedVisibleScope.RootLifetimeScope;
+            return mostNestedVisibleScope;
         }
     }
 }

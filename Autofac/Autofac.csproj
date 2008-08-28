@@ -63,50 +63,56 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DependencyResolutionExceptionResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="IDynamicRegistrationSource.cs" />
-    <Compile Include="MatchingScopeLifetimeResources.Designer.cs">
+    <Compile Include="RegistrationSources\IDynamicRegistrationSource.cs" />
+    <Compile Include="Lifetime\MatchingScopeLifetimeResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>MatchingScopeLifetimeResources.resx</DependentUpon>
     </Compile>
     <Compile Include="RegistrationExtensions.cs" />
-    <Compile Include="ComponentActivation.cs" />
-    <Compile Include="ComponentRegisteredEventArgs.cs" />
-    <Compile Include="ComponentRegistration.cs" />
+    <Compile Include="Resolving\ComponentActivation.cs" />
+    <Compile Include="Registry\ComponentRegisteredEventArgs.cs" />
+    <Compile Include="Registry\ComponentRegistration.cs" />
     <Compile Include="ResolutionExtensions.cs" />
-    <Compile Include="Disposer.cs" />
+    <Compile Include="Disposal\Disposer.cs" />
     <Compile Include="IContainer.cs" />
-    <Compile Include="IDisposer.cs" />
+    <Compile Include="Disposal\IDisposer.cs" />
     <Compile Include="IModule.cs" />
-    <Compile Include="InstanceOwnership.cs" />
-    <Compile Include="ComponentRegistry.cs" />
+    <Compile Include="Disposal\InstanceOwnership.cs" />
+    <Compile Include="Registry\ComponentRegistry.cs" />
     <Compile Include="Container.cs" />
-    <Compile Include="CurrentScopeLifetime.cs" />
-    <Compile Include="IInstanceActivator.cs" />
+    <Compile Include="Lifetime\CurrentScopeLifetime.cs" />
+    <Compile Include="Activators\IInstanceActivator.cs" />
     <Compile Include="IComponentContext.cs" />
-    <Compile Include="IComponentLifetime.cs" />
-    <Compile Include="IComponentRegistration.cs" />
-    <Compile Include="IComponentRegistry.cs" />
+    <Compile Include="Lifetime\IComponentLifetime.cs" />
+    <Compile Include="Registry\IComponentRegistration.cs" />
+    <Compile Include="Registry\IComponentRegistry.cs" />
     <Compile Include="ILifetimeScope.cs" />
-    <Compile Include="ISharingLifetimeScope.cs" />
+    <Compile Include="Lifetime\ISharingLifetimeScope.cs" />
     <Compile Include="InstanceSharing.cs" />
-    <Compile Include="Disposable.cs" />
+    <Compile Include="Disposal\Disposable.cs" />
     <Compile Include="Enforce.cs" />
     <Compile Include="EnforceResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EnforceResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="IDeferredRegistrationSource.cs" />
-    <Compile Include="MatchingScopeLifetime.cs" />
-    <Compile Include="NamedService.cs" />
+    <Compile Include="RegistrationSources\IDeferredRegistrationSource.cs" />
+    <Compile Include="Lifetime\MatchingScopeLifetime.cs" />
+    <Compile Include="Services\NamedService.cs" />
     <Compile Include="Parameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResolveOperationResources.Designer.cs">
+    <Compile Include="Resolving\CircularDependencyDetectorResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CircularDependencyDetectorResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resolving\ResolveOperationResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ResolveOperationResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resolving\CircularDependencyDetector.cs" />
     <Compile Include="Syntax\ConcreteRegistrar.cs" />
     <Compile Include="RegistrationSources\ConcreteRegistrationData.cs" />
     <Compile Include="Syntax\IConcreteRegistrar.cs" />
@@ -116,14 +122,14 @@
     <Compile Include="RegistrationSources\IConcreteRegistrationData.cs" />
     <Compile Include="RegistrationSources\IRegistrationData.cs" />
     <Compile Include="RegistrationSources\DeferredRegistrationSource.cs" />
-    <Compile Include="ResolveOperation.cs" />
-    <Compile Include="LifetimeScope.cs" />
-    <Compile Include="RootScopeLifetime.cs" />
-    <Compile Include="Service.cs" />
+    <Compile Include="Resolving\ResolveOperation.cs" />
+    <Compile Include="Lifetime\LifetimeScope.cs" />
+    <Compile Include="Lifetime\RootScopeLifetime.cs" />
+    <Compile Include="Services\Service.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="RegistrationSources\DynamicRegistrationSource.cs" />
-    <Compile Include="TypedService.cs" />
-    <Compile Include="UniqueService.cs" />
+    <Compile Include="Services\TypedService.cs" />
+    <Compile Include="Services\UniqueService.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ComponentNotRegisteredExceptionResources.resx">
@@ -141,12 +147,17 @@
       <LastGenOutput>EnforceResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="MatchingScopeLifetimeResources.resx">
+    <EmbeddedResource Include="Lifetime\MatchingScopeLifetimeResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>MatchingScopeLifetimeResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="ResolveOperationResources.resx">
+    <EmbeddedResource Include="Resolving\CircularDependencyDetectorResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CircularDependencyDetectorResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resolving\ResolveOperationResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ResolveOperationResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>

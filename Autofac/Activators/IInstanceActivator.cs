@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Autofac.Lifetime;
 
-namespace Autofac
+namespace Autofac.Activators
 {
     public interface IInstanceActivator
     {

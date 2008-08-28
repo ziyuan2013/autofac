@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Autofac {
+namespace Autofac.Resolving {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Autofac {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "2.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class MatchingScopeLifetimeResources {
+    internal class CircularDependencyDetectorResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal MatchingScopeLifetimeResources() {
+        internal CircularDependencyDetectorResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Autofac {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Autofac.MatchingScopeLifetimeResources", typeof(MatchingScopeLifetimeResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Autofac.Resolving.CircularDependencyDetectorResources", typeof(CircularDependencyDetectorResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,11 @@ namespace Autofac {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No scope matching the expression &apos;{0}&apos; is visible from the scope in which the instance was requested..
+        ///   Looks up a localized string similar to Circular component dependency detected: {0}..
         /// </summary>
-        internal static string MatchingScopeNotFound {
+        internal static string CircularDependency {
             get {
-                return ResourceManager.GetString("MatchingScopeNotFound", resourceCulture);
+                return ResourceManager.GetString("CircularDependency", resourceCulture);
             }
         }
     }

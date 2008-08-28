@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
+using Autofac.Registry;
+using Autofac.Lifetime;
+using Autofac.Services;
 
-namespace Autofac
+namespace Autofac.Resolving
 {
     class ResolveOperation : IComponentContext
     {
@@ -10,6 +13,7 @@ namespace Autofac
         Stack<ComponentActivation> _activationStack = new Stack<ComponentActivation>();
         ICollection<ComponentActivation> _successfulActivations;
         ISharingLifetimeScope _mostNestedLifetimeScope;
+        CircularDependencyDetector _circularDependencyDetector = new CircularDependencyDetector();
         
         public ResolveOperation(ISharingLifetimeScope mostNestedLifetimeScope, IComponentRegistry componentRegistry)
         {
@@ -41,9 +45,7 @@ namespace Autofac
                 return false;
             }
 
-            if (IsCircularDependency(service))
-                throw new DependencyResolutionException(string.Format(CultureInfo.CurrentCulture,
-                    ResolveOperationResources.CircularDependency, CreateDependencyGraphTo(service)));
+            _circularDependencyDetector.CheckForCircularDependency(service, _activationStack);
 
             var activation = new ComponentActivation(registration, service, this, CurrentActivationScope);
 
@@ -80,25 +82,6 @@ namespace Autofac
         public IComponentRegistry ComponentRegistry
         {
             get { return _componentRegistry; }
-        }
-
-        string CreateDependencyGraphTo(Service service)
-        {
-            Enforce.ArgumentNotNull(service, "service");
-
-            string dependencyGraph = service.Description;
-
-            foreach (Service requestor in _activationStack.Select(a => a.RequestedService))
-                dependencyGraph = requestor.Description + " -> " + dependencyGraph;
-
-            return dependencyGraph;
-        }
-
-        bool IsCircularDependency(Service service)
-        {
-            Enforce.ArgumentNotNull(service, "service");
-
-            return _activationStack.Count(a => a.RequestedService == service) >= 1;
         }
     }
 }

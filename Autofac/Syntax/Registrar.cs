@@ -1,4 +1,5 @@
 ﻿using Autofac.RegistrationSources;
+using Autofac.Disposal;
 
 namespace Autofac.Syntax
 {

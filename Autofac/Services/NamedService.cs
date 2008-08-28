@@ -23,26 +23,39 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 
-namespace Autofac
+
+namespace Autofac.Services
 {
     /// <summary>
-    /// A handy unique service identifier type - all instances will be regarded as unequal.
+    /// Identifies a service using a textual name.
     /// </summary>
-    public class UniqueService : Service
+    public class NamedService : Service
     {
-        Guid _id = Guid.NewGuid();
+        /// <summary>
+        /// Gets or sets the name of the service.
+        /// </summary>
+        /// <value>The name of the service.</value>
+        string ServiceName { get; set; }
 
         /// <summary>
-        /// Provides a programmer-readable description of the identifying feature of the service.
+        /// Initializes a new instance of the <see cref="NamedService"/> class.
         /// </summary>
-        /// <value></value>
+        /// <param name="serviceName">Name of the service.</param>
+        public NamedService(string serviceName)
+        {
+            ServiceName = Enforce.ArgumentNotNullOrEmpty(serviceName, "serviceName");
+        }
+
+        /// <summary>
+        /// Gets a human-readable description of the service.
+        /// </summary>
+        /// <value>The description.</value>
         public override string Description
         {
             get
             {
-                return _id.ToString();
+                return ServiceName;
             }
         }
 
@@ -56,9 +69,12 @@ namespace Autofac
         /// <exception cref="T:System.NullReferenceException">The <paramref name="obj"/> parameter is null.</exception>
         public override bool Equals(object obj)
         {
-            UniqueService that = obj as UniqueService;
+            NamedService that = obj as NamedService;
 
-            return that != null && _id == that._id;
+            if (that == null)
+                return false;
+
+            return ServiceName == that.ServiceName;
         }
 
         /// <summary>
@@ -69,7 +85,7 @@ namespace Autofac
         /// </returns>
         public override int GetHashCode()
         {
-            return _id.GetHashCode();
+            return ServiceName.GetHashCode();
         }
     }
 }

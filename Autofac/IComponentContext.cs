@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Autofac.Registry;
+using Autofac.Services;
 
 namespace Autofac
 {

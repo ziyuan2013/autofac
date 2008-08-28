@@ -1,5 +1,5 @@
 ﻿
-namespace Autofac
+namespace Autofac.Lifetime
 {
     public interface IComponentLifetime
     {

@@ -25,38 +25,50 @@
 
 using System;
 
-namespace Autofac
+namespace Autofac.Services
 {
     /// <summary>
-    /// Identifies a service according to a type to which it can be assigned.
+    /// Services are the lookup keys used to locate component instances.
     /// </summary>
-    public class TypedService : Service
+    public abstract class Service
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypedService"/> class.
-        /// </summary>
-        /// <param name="serviceType">Type of the service.</param>
-        public TypedService(Type serviceType)
-        {
-            ServiceType = Enforce.ArgumentNotNull(serviceType, "serviceType");
-        }
-
-        /// <summary>
-        /// Gets or sets the type of the service.
-        /// </summary>
-        /// <value>The type of the service.</value>
-        public Type ServiceType { get; private set; }
-
         /// <summary>
         /// Gets a human-readable description of the service.
         /// </summary>
         /// <value>The description.</value>
-        public override string Description
+        public abstract string Description { get; }
+
+        /// <summary>
+        /// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+        /// </returns>
+        public override string ToString()
         {
-            get
-            {
-                return ServiceType.FullName;
-            }
+            return Description;
+        }
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="lhs">The LHS.</param>
+        /// <param name="rhs">The RHS.</param>
+        /// <returns>The result of the operator.</returns>
+        public static bool operator ==(Service lhs, Service rhs)
+        {
+            return object.Equals(lhs, rhs);
+        }
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="lhs">The LHS.</param>
+        /// <param name="rhs">The RHS.</param>
+        /// <returns>The result of the operator.</returns>
+        public static bool operator !=(Service lhs, Service rhs)
+        {
+            return !(lhs == rhs);
         }
 
         /// <summary>
@@ -69,12 +81,8 @@ namespace Autofac
         /// <exception cref="T:System.NullReferenceException">The <paramref name="obj"/> parameter is null.</exception>
         public override bool Equals(object obj)
         {
-            TypedService that = obj as TypedService;
-
-            if (that == null)
-                return false;
-
-            return ServiceType == that.ServiceType;
+            throw new NotImplementedException(
+                "Subclasses of Autofac.Service must override Object.Equals()");
         }
 
         /// <summary>
@@ -85,7 +93,8 @@ namespace Autofac
         /// </returns>
         public override int GetHashCode()
         {
-            return ServiceType.GetHashCode();
+            throw new NotImplementedException(
+                "Subclasses of Autofac.Service must override Object.GetHashCode()");
         }
     }
 }

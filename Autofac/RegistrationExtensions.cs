@@ -3,6 +3,7 @@ using Autofac.RegistrationSources;
 using Autofac.Syntax;
 using System;
 using System.Collections.Generic;
+using Autofac.Registry;
 
 namespace Autofac
 {

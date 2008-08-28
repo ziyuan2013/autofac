@@ -2,6 +2,10 @@
 using System;
 using Autofac.Activators;
 using System.Collections.Generic;
+using Autofac.Registry;
+using Autofac.Lifetime;
+using Autofac.Services;
+using Autofac.Disposal;
 
 namespace Autofac.Tests
 {
@@ -314,167 +318,158 @@ namespace Autofac.Tests
             Assert.AreNotSame(e.B, cd.B);
         }
 
-        //[Test]
-        //public void DisposeOrder1()
-        //{
-        //    var target = new Container();
+        [Test]
+        public void DisposeOrder1()
+        {
+            var target = new Container();
 
-        //    target.RegisterComponent(CreateRegistration(
-        //        new[] { new TypedService(typeof(A)) },
-        //        new ReflectionActivator(typeof(A))));
+            target.RegisterComponent(CreateRegistration(
+                new ReflectionActivator(typeof(A)),
+                new[] { new TypedService(typeof(A)) }));
 
-        //    target.RegisterComponent(CreateRegistration(
-        //        new[] { new TypedService(typeof(B)) },
-        //        new ReflectionActivator(typeof(B))));
+            target.RegisterComponent(CreateRegistration(
+                new DelegateActivator(typeof(B), (c,p) => new B(c.Resolve<A>())),
+                new[] { new TypedService(typeof(B)) }));
 
-        //    A a = target.Resolve<A>();
-        //    B b = target.Resolve<B>();
+            A a = target.Resolve<A>();
+            B b = target.Resolve<B>();
 
-        //    Queue<object> disposeOrder = new Queue<object>();
+            Queue<object> disposeOrder = new Queue<object>();
 
-        //    a.Disposing += (s, e) => disposeOrder.Enqueue(a);
-        //    b.Disposing += (s, e) => disposeOrder.Enqueue(b);
+            a.Disposing += (s, e) => disposeOrder.Enqueue(a);
+            b.Disposing += (s, e) => disposeOrder.Enqueue(b);
 
-        //    target.Dispose();
+            target.Dispose();
 
-        //    // B depends on A, therefore B should be disposed first
+            // B depends on A, therefore B should be disposed first
 
-        //    Assert.AreEqual(2, disposeOrder.Count);
-        //    Assert.AreSame(b, disposeOrder.Dequeue());
-        //    Assert.AreSame(a, disposeOrder.Dequeue());
-        //}
+            Assert.AreEqual(2, disposeOrder.Count);
+            Assert.AreSame(b, disposeOrder.Dequeue());
+            Assert.AreSame(a, disposeOrder.Dequeue());
+        }
 
-        //// In this version, resolve order is reversed.
-        //[Test]
-        //public void DisposeOrder2()
-        //{
-        //    var target = new Container();
+        // In this version, resolve order is reversed.
+        [Test]
+        public void DisposeOrder2()
+        {
+            var target = new Container();
 
-        //    target.RegisterComponent(CreateRegistration(
-        //        new Service[] { new TypedService(typeof(A)) },
-        //        new ReflectionActivator(typeof(A))));
+            target.RegisterComponent(CreateRegistration(
+                new ReflectionActivator(typeof(A)),
+                new[] { new TypedService(typeof(A)) }));
 
-        //    target.RegisterComponent(CreateRegistration(
-        //        new Service[] { new TypedService(typeof(B)) },
-        //        new ReflectionActivator(typeof(B))));
+            target.RegisterComponent(CreateRegistration(
+                new DelegateActivator(typeof(B), (c, p) => new B(c.Resolve<A>())),
+                new[] { new TypedService(typeof(B)) }));
 
-        //    B b = target.Resolve<B>();
-        //    A a = target.Resolve<A>();
+            B b = target.Resolve<B>();
+            A a = target.Resolve<A>();
 
-        //    Queue<object> disposeOrder = new Queue<object>();
+            Queue<object> disposeOrder = new Queue<object>();
 
-        //    a.Disposing += (s, e) => disposeOrder.Enqueue(a);
-        //    b.Disposing += (s, e) => disposeOrder.Enqueue(b);
+            a.Disposing += (s, e) => disposeOrder.Enqueue(a);
+            b.Disposing += (s, e) => disposeOrder.Enqueue(b);
 
-        //    target.Dispose();
+            target.Dispose();
 
-        //    // B depends on A, therefore B should be disposed first
+            // B depends on A, therefore B should be disposed first
 
-        //    Assert.AreEqual(2, disposeOrder.Count);
-        //    Assert.AreSame(b, disposeOrder.Dequeue());
-        //    Assert.AreSame(a, disposeOrder.Dequeue());
-        //}
+            Assert.AreEqual(2, disposeOrder.Count);
+            Assert.AreSame(b, disposeOrder.Dequeue());
+            Assert.AreSame(a, disposeOrder.Dequeue());
+        }
 
-        //[Test]
-        //public void ResolveSingletonFromContext()
-        //{
-        //    var builder = new ContainerBuilder();
+        [Test]
+        public void ResolveSingletonFromContext()
+        {
+            var target = new Container();
 
-        //    builder.Register<A>()
-        //        .WithScope(InstanceScope.Singleton);
+            target.RegisterType<A>().SingleInstance();
 
-        //    var target = builder.Build();
+            var context = target.BeginLifetimeScope();
 
-        //    var context = target.CreateInnerContainer();
+            var ctxA = context.Resolve<A>();
+            var targetA = target.Resolve<A>();
 
-        //    var ctxA = context.Resolve<A>();
-        //    var targetA = target.Resolve<A>();
+            Assert.AreSame(ctxA, targetA);
+            Assert.IsNotNull(ctxA);
 
-        //    Assert.AreSame(ctxA, targetA);
-        //    Assert.IsNotNull(ctxA);
+            Assert.IsFalse(ctxA.IsDisposed);
 
-        //    Assert.IsFalse(ctxA.IsDisposed);
+            context.Dispose();
 
-        //    context.Dispose();
+            Assert.IsFalse(ctxA.IsDisposed);
 
-        //    Assert.IsFalse(ctxA.IsDisposed);
+            target.Dispose();
 
-        //    target.Dispose();
+            Assert.IsTrue(ctxA.IsDisposed);
+        }
 
-        //    Assert.IsTrue(ctxA.IsDisposed);
-        //}
+        [Test]
+        public void ResolveTransientFromContext()
+        {
+            var target = new Container();
 
-        //[Test]
-        //public void ResolveTransientFromContext()
-        //{
-        //    var target = new Container();
+            target.RegisterType<A>().UnsharedInstances();
 
-        //    target.RegisterComponent(CreateRegistration(
-        //        new Service[] { new TypedService(typeof(A)) },
-        //        new ReflectionActivator(typeof(A)),
-        //        new FactoryScope()));
+            var context = target.BeginLifetimeScope();
 
-        //    var context = target.CreateInnerContainer();
+            var ctxA = context.Resolve<A>();
+            var targetA = target.Resolve<A>();
 
-        //    var ctxA = context.Resolve<A>();
-        //    var targetA = target.Resolve<A>();
+            Assert.IsNotNull(ctxA);
+            Assert.IsNotNull(targetA);
+            Assert.AreNotSame(ctxA, targetA);
 
-        //    Assert.IsNotNull(ctxA);
-        //    Assert.IsNotNull(targetA);
-        //    Assert.AreNotSame(ctxA, targetA);
+            Assert.IsFalse(targetA.IsDisposed);
+            Assert.IsFalse(ctxA.IsDisposed);
 
-        //    Assert.IsFalse(targetA.IsDisposed);
-        //    Assert.IsFalse(ctxA.IsDisposed);
+            context.Dispose();
 
-        //    context.Dispose();
+            Assert.IsFalse(targetA.IsDisposed);
+            Assert.IsTrue(ctxA.IsDisposed);
 
-        //    Assert.IsFalse(targetA.IsDisposed);
-        //    Assert.IsTrue(ctxA.IsDisposed);
+            target.Dispose();
 
-        //    target.Dispose();
+            Assert.IsTrue(targetA.IsDisposed);
+            Assert.IsTrue(ctxA.IsDisposed);
+        }
 
-        //    Assert.IsTrue(targetA.IsDisposed);
-        //    Assert.IsTrue(ctxA.IsDisposed);
-        //}
+        [Test]
+        public void ResolveScopedFromContext()
+        {
+            var target = new Container();
 
-        //[Test]
-        //public void ResolveScopedFromContext()
-        //{
-        //    var target = new Container();
+            target.RegisterType<A>().InstancePerLifetimeScope();
 
-        //    target.RegisterComponent(CreateRegistration(
-        //        new Service[] { new TypedService(typeof(A)) },
-        //        new ReflectionActivator(typeof(A)),
-        //        new ContainerScope()));
+            var context = target.BeginLifetimeScope();
 
-        //    var context = target.CreateInnerContainer();
+            var ctxA = context.Resolve<A>();
+            var ctxA2 = context.Resolve<A>();
 
-        //    var ctxA = context.Resolve<A>();
-        //    var ctxA2 = context.Resolve<A>();
+            Assert.IsNotNull(ctxA);
+            Assert.AreSame(ctxA, ctxA2);
 
-        //    Assert.IsNotNull(ctxA);
-        //    Assert.AreSame(ctxA, ctxA2);
+            var targetA = target.Resolve<A>();
+            var targetA2 = target.Resolve<A>();
 
-        //    var targetA = target.Resolve<A>();
-        //    var targetA2 = target.Resolve<A>();
+            Assert.IsNotNull(targetA);
+            Assert.AreSame(targetA, targetA2);
+            Assert.AreNotSame(ctxA, targetA);
 
-        //    Assert.IsNotNull(targetA);
-        //    Assert.AreSame(targetA, targetA2);
-        //    Assert.AreNotSame(ctxA, targetA);
+            Assert.IsFalse(targetA.IsDisposed);
+            Assert.IsFalse(ctxA.IsDisposed);
 
-        //    Assert.IsFalse(targetA.IsDisposed);
-        //    Assert.IsFalse(ctxA.IsDisposed);
+            context.Dispose();
 
-        //    context.Dispose();
+            Assert.IsFalse(targetA.IsDisposed);
+            Assert.IsTrue(ctxA.IsDisposed);
 
-        //    Assert.IsFalse(targetA.IsDisposed);
-        //    Assert.IsTrue(ctxA.IsDisposed);
+            target.Dispose();
 
-        //    target.Dispose();
-
-        //    Assert.IsTrue(targetA.IsDisposed);
-        //    Assert.IsTrue(ctxA.IsDisposed);
-        //}
+            Assert.IsTrue(targetA.IsDisposed);
+            Assert.IsTrue(ctxA.IsDisposed);
+        }
 
         //class ObjectRegistrationSource : IRegistrationSource
         //{

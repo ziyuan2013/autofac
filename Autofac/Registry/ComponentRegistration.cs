@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autofac.Lifetime;
+using Autofac.Disposal;
+using Autofac.Activators;
+using Autofac.Services;
 
-namespace Autofac
+namespace Autofac.Registry
 {
     public class ComponentRegistration : IComponentRegistration
     {

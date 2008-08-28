@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Autofac
+namespace Autofac.Disposal
 {
     public interface IDisposer : IDisposable
     {

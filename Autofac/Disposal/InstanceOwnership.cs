@@ -1,5 +1,5 @@
 ﻿
-namespace Autofac
+namespace Autofac.Disposal
 {
     public enum InstanceOwnership
     {

@@ -14,9 +14,9 @@ namespace Autofac.Activators
             _instance = instance;
         }
 
-        public object ActivateInstance(ILifetimeScope activationScope, IEnumerable<Parameter> parameters)
+        public object ActivateInstance(IComponentContext context, IEnumerable<Parameter> parameters)
         {
-            Enforce.ArgumentNotNull(activationScope, "activationScope");
+            Enforce.ArgumentNotNull(context, "context");
             Enforce.ArgumentNotNull(parameters, "parameters");
 
             if (_activated)

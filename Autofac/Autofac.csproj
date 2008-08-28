@@ -57,7 +57,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ComponentNotRegisteredExceptionResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="DependencyResolutionException.cs" />
+    <Compile Include="DependencyResolutionExceptionResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DependencyResolutionExceptionResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="IDynamicRegistrationSource.cs" />
+    <Compile Include="MatchingScopeLifetimeResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MatchingScopeLifetimeResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RegistrationExtensions.cs" />
     <Compile Include="ComponentActivation.cs" />
     <Compile Include="ComponentRegisteredEventArgs.cs" />
@@ -91,6 +102,11 @@
     <Compile Include="NamedService.cs" />
     <Compile Include="Parameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResolveOperationResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResolveOperationResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Syntax\ConcreteRegistrar.cs" />
     <Compile Include="RegistrationSources\ConcreteRegistrationData.cs" />
     <Compile Include="Syntax\IConcreteRegistrar.cs" />
@@ -115,9 +131,24 @@
       <LastGenOutput>ComponentNotRegisteredExceptionResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="DependencyResolutionExceptionResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DependencyResolutionExceptionResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="EnforceResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>EnforceResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MatchingScopeLifetimeResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MatchingScopeLifetimeResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResolveOperationResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResolveOperationResources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

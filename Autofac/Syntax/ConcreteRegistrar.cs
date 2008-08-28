@@ -67,11 +67,41 @@ namespace Autofac.Syntax
             return this;
         }
 
-        public IConcreteRegistrar<T> InstancePer<TTag>(TTag lifetimeScopeTag)
+        public IConcreteRegistrar<T> InstancePer(object lifetimeScopeTag)
         {
             Sharing = InstanceSharing.None;
-            Lifetime = new MatchingScopeLifetime(scope => false); // scope.Resolve<TagTracker>().IsTaggedWith(lifetimeScopeTag));
+            Lifetime = new MatchingScopeLifetime(scope => scope.Tag == lifetimeScopeTag);
             return this;
+        }
+
+        public IConcreteRegistrar<T> As<TService>()
+        {
+            return As(new TypedService(typeof(TService)));
+        }
+
+        public IConcreteRegistrar<T> As<TService1, TService2>()
+        {
+            return As(new TypedService(typeof(TService1)), new TypedService(typeof(TService2)));
+        }
+
+        public IConcreteRegistrar<T> As<TService1, TService2, TService3>()
+        {
+            return As(new TypedService(typeof(TService1)), new TypedService(typeof(TService2)), new TypedService(typeof(TService3)));
+        }
+
+        public IConcreteRegistrar<T> As(params Service[] services)
+        {
+            Enforce.ArgumentNotNull(services, "services");
+
+            foreach (var service in services)
+                base.Services.Add(service);
+
+            return this;
+        }
+
+        public IConcreteRegistrar<T> Named(string name)
+        {
+            return As(new NamedService(name));
         }
     }
 }

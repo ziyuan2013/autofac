@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Linq.Expressions;
+using System.Globalization;
 
 namespace Autofac
 {
     public class MatchingScopeLifetime : IComponentLifetime
     {
-        Predicate<ILifetimeScope> _matcher;
+        Func<ILifetimeScope, bool> _matcher;
+        string _matchExpressionCode;
 
-        public MatchingScopeLifetime(Predicate<ILifetimeScope> matcher)
+        public MatchingScopeLifetime(Expression<Func<ILifetimeScope, bool>> matchExpression)
         {
-            _matcher = Enforce.ArgumentNotNull(matcher, "matcher");
+            Enforce.ArgumentNotNull(matchExpression, "matchExpression");
+            _matcher = matchExpression.Compile();
+            _matchExpressionCode = matchExpression.Body.ToString();
         }
 
         public ISharingLifetimeScope FindScope(ISharingLifetimeScope mostNestedVisibleScope)
@@ -24,7 +29,8 @@ namespace Autofac
                 next = next.ParentLifetimeScope;
             }
 
-            throw new InvalidOperationException("no match");
+            throw new DependencyResolutionException(string.Format(
+                CultureInfo.CurrentCulture, MatchingScopeLifetimeResources.MatchingScopeNotFound, _matchExpressionCode));
         }
     }
 }

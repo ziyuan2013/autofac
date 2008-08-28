@@ -13,9 +13,9 @@ namespace Autofac.Activators
             _implementationType = implementationType;
         }
 
-        public object ActivateInstance(ILifetimeScope activationScope, IEnumerable<Parameter> parameters)
+        public object ActivateInstance(IComponentContext context, IEnumerable<Parameter> parameters)
         {
-            Enforce.ArgumentNotNull(activationScope, "activationScope");
+            Enforce.ArgumentNotNull(context, "context");
             Enforce.ArgumentNotNull(parameters, "parameters");
 
             return Activator.CreateInstance(_implementationType);

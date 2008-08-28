@@ -10,6 +10,7 @@ namespace Autofac
         ISharingLifetimeScope _parent;
         IDisposer _disposer = new Disposer();
         IDictionary<Guid, object> _sharedInstances = new Dictionary<Guid, object>();
+        object _tag;
 
         protected LifetimeScope(IComponentRegistry componentRegistry, LifetimeScope parent)
             : this(componentRegistry)
@@ -60,6 +61,12 @@ namespace Autofac
         public IDisposer Disposer
         {
             get { return _disposer; }
+        }
+
+        public object Tag
+        {
+            get { return _tag; }
+            set { _tag = value; }
         }
 
         public IComponentRegistry ComponentRegistry

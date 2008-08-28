@@ -57,6 +57,15 @@ namespace Autofac
             return CreateConcreteRegistration<object>(container, new ReflectionActivator(implementationType));
         }
 
+        public static IConcreteRegistrar<T> RegisterDelegate<T>(this IContainer container, Func<IComponentContext, T> creationDelegate)
+            where T : class
+        {
+            Enforce.ArgumentNotNull(container, "container");
+            Enforce.ArgumentNotNull(creationDelegate, "creationDelegate");
+
+            return RegisterDelegate<T>(container, (c, p) => creationDelegate(c));
+        }
+
         public static IConcreteRegistrar<T> RegisterDelegate<T>(this IContainer container, Func<IComponentContext, IEnumerable<Parameter>, T> creationDelegate)
             where T : class
         {

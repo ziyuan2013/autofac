@@ -34,6 +34,12 @@ namespace Autofac
             get { return _rootLifetimeScope.Disposer; }
         }
 
+        public object Tag
+        {
+            get { return _rootLifetimeScope.Tag; }
+            set { _rootLifetimeScope.Tag = value; }
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

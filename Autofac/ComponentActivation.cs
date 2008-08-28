@@ -6,6 +6,7 @@ namespace Autofac
     class ComponentActivation
     {
         IComponentRegistration _registration;
+        Service _requestedService;
         IComponentContext _context;
         ISharingLifetimeScope _mostNestedVisibleScope;
         ISharingLifetimeScope _activationScope;
@@ -13,13 +14,19 @@ namespace Autofac
 
         public ComponentActivation(
             IComponentRegistration registration,
+            Service requestedService,
             IComponentContext context,
             ISharingLifetimeScope mostNestedVisibleScope)
         {
             _registration = Enforce.ArgumentNotNull(registration, "registration");
+            _requestedService = Enforce.ArgumentNotNull(requestedService, "requestedService");
             _context = Enforce.ArgumentNotNull(context, "context");
             _mostNestedVisibleScope = Enforce.ArgumentNotNull(mostNestedVisibleScope, "mostNestedVisibleScope");
         }
+
+        public Service RequestedService { get { return _requestedService; } }
+
+        public IComponentRegistration Registration { get { return _registration; } }
 
         public object Execute(IEnumerable<Parameter> parameters)
         {
@@ -33,7 +40,7 @@ namespace Autofac
             if (IsSharedInstanceAvailable(out sharedInstance))
                 return sharedInstance;
 
-            _newInstance = _registration.Activator.ActivateInstance(_activationScope, parameters);
+            _newInstance = _registration.Activator.ActivateInstance(_context, parameters);
 
             AssignNewInstanceOwnership();
 

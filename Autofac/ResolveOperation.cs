@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 
 namespace Autofac
 {
@@ -40,7 +41,11 @@ namespace Autofac
                 return false;
             }
 
-            var activation = new ComponentActivation(registration, this, CurrentActivationScope);
+            if (IsCircularDependency(service))
+                throw new DependencyResolutionException(string.Format(CultureInfo.CurrentCulture,
+                    ResolveOperationResources.CircularDependency, CreateDependencyGraphTo(service)));
+
+            var activation = new ComponentActivation(registration, service, this, CurrentActivationScope);
 
             _activationStack.Push(activation);
             try
@@ -75,6 +80,25 @@ namespace Autofac
         public IComponentRegistry ComponentRegistry
         {
             get { return _componentRegistry; }
+        }
+
+        string CreateDependencyGraphTo(Service service)
+        {
+            Enforce.ArgumentNotNull(service, "service");
+
+            string dependencyGraph = service.Description;
+
+            foreach (Service requestor in _activationStack.Select(a => a.RequestedService))
+                dependencyGraph = requestor.Description + " -> " + dependencyGraph;
+
+            return dependencyGraph;
+        }
+
+        bool IsCircularDependency(Service service)
+        {
+            Enforce.ArgumentNotNull(service, "service");
+
+            return _activationStack.Count(a => a.RequestedService == service) >= 1;
         }
     }
 }

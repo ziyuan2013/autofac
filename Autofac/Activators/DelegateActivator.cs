@@ -15,12 +15,12 @@ namespace Autofac.Activators
             _activationFunction = Enforce.ArgumentNotNull(activationFunction, "activationFunction");
         }
 
-        public object ActivateInstance(ILifetimeScope activationScope, IEnumerable<Parameter> parameters)
+        public object ActivateInstance(IComponentContext context, IEnumerable<Parameter> parameters)
         {
-            Enforce.ArgumentNotNull(activationScope, "activationScope");
+            Enforce.ArgumentNotNull(context, "context");
             Enforce.ArgumentNotNull(parameters, "parameters");
 
-            return _activationFunction(activationScope, parameters);
+            return _activationFunction(context, parameters);
         }
     }
 }

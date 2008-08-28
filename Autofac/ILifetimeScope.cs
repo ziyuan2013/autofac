@@ -7,5 +7,7 @@ namespace Autofac
         ILifetimeScope BeginLifetimeScope();
 
         IDisposer Disposer { get; }
+
+        object Tag { get; set; }
     }
 }

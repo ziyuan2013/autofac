@@ -156,167 +156,163 @@ namespace Autofac.Tests
             container.RegisterType<object>().UnsharedInstances();
         }
 
-        //[Test]
-        //public void CircularDependency()
-        //{
-        //    try
-        //    {
-        //        var builder = new ContainerBuilder();
-        //        builder.Register(c => c.Resolve<object>());
+        [Test]
+        public void CircularDependencyIsDetected()
+        {
+            var target = new Container();
+            target.RegisterDelegate(c => c.Resolve<object>());
+            try
+            {
+                target.Resolve<object>();
+            }
+            catch (DependencyResolutionException de)
+            {
+                Assert.IsNull(de.InnerException);
+                Assert.IsTrue(de.Message.Contains("System.Object -> System.Object"));
+                Assert.IsFalse(de.Message.Contains("System.Object -> System.Object -> System.Object"));
+                return;
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail("Expected a DependencyResolutionException, got {0}.", ex);
+                return;
+            }
 
-        //        var target = builder.Build();
-        //        target.Resolve<object>();
-        //    }
-        //    catch (DependencyResolutionException de)
-        //    {
-        //        Assert.IsNull(de.InnerException);
-        //        Assert.IsTrue(de.Message.Contains("System.Object -> System.Object"));
-        //        return;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Assert.Fail("Expected a DependencyResolutionException, got {0}.", ex);
-        //        return;
-        //    }
+            Assert.Fail("Expected a DependencyResolutionException.");
+        }
 
-        //    Assert.Fail("Expected a DependencyResolutionException.");
-        //}
+        // In the below scenario, B depends on A, CD depends on A and B,
+        // and E depends on IC and B.
 
-        //// In the below scenario, B depends on A, CD depends on A and B,
-        //// and E depends on IC and B.
+        #region Scenario Classes
 
-        //#region Scenario Classes
+        class A : DisposeTracker { }
 
-        //class A : DisposeTracker { }
+        class B : DisposeTracker
+        {
+            public A A;
 
-        //class B : DisposeTracker
-        //{
-        //    public A A;
+            public B(A a)
+            {
+                A = a;
+            }
+        }
 
-        //    public B(A a)
-        //    {
-        //        A = a;
-        //    }
-        //}
+        interface IC { }
 
-        //interface IC { }
+        class C : DisposeTracker
+        {
+            public B B;
 
-        //class C : DisposeTracker
-        //{
-        //    public B B;
+            public C(B b)
+            {
+                B = b;
+            }
+        }
 
-        //    public C(B b)
-        //    {
-        //        B = b;
-        //    }
-        //}
+        interface ID { }
 
-        //interface ID { }
+        class CD : DisposeTracker, IC, ID
+        {
+            public A A;
+            public B B;
 
-        //class CD : DisposeTracker, IC, ID
-        //{
-        //    public A A;
-        //    public B B;
+            public CD(A a, B b)
+            {
+                A = a;
+                B = b;
+            }
+        }
 
-        //    public CD(A a, B b)
-        //    {
-        //        A = a;
-        //        B = b;
-        //    }
-        //}
+        class E : DisposeTracker
+        {
+            public B B;
+            public IC C;
 
-        //class E : DisposeTracker
-        //{
-        //    public B B;
-        //    public IC C;
+            public E(B b, IC c)
+            {
+                B = b;
+                C = c;
+            }
+        }
 
-        //    public E(B b, IC c)
-        //    {
-        //        B = b;
-        //        C = c;
-        //    }
-        //}
+        class F
+        {
+            public IList<A> AList;
+            public F(IList<A> aList)
+            {
+                AList = aList;
+            }
+        }
 
-        //class F
-        //{
-        //    public IList<A> AList;
-        //    public F(IList<A> aList)
-        //    {
-        //        AList = aList;
-        //    }
-        //}
+        #endregion
 
-        //#endregion
+        [Test]
+        [ExpectedException(typeof(DependencyResolutionException))]
+        public void InnerCannotResolveOuterDependencies()
+        {
+            var outer = new Container();
+            outer.RegisterDelegate(c => new B(c.Resolve<A>())).SingleInstance();
+            outer.RegisterDelegate(c => new C(c.Resolve<B>())).InstancePer("inner");
+            outer.RegisterType<A>().InstancePer("inner");
+            var inner = outer.BeginLifetimeScope();
+            inner.Tag = "inner";
+            var unused = inner.Resolve<C>();
+        }
 
-        //[Test]
-        //[ExpectedException(typeof(DependencyResolutionException))]
-        //public void InnerCannotResolveOuterDependencies()
-        //{
-        //    var outerBuilder = new ContainerBuilder();
-        //    outerBuilder.Register<B>()
-        //        .WithScope(InstanceScope.Singleton);
-        //    var outer = outerBuilder.Build();
+        [Test]
+        public void OuterInstancesCannotReferenceInner()
+        {
+            var outer = new Container();
 
-        //    var innerBuilder = new ContainerBuilder();
-        //    innerBuilder.Register<C>();
-        //    innerBuilder.Register<A>();
-        //    var inner = outer.CreateInnerContainer();
-        //    innerBuilder.Build(inner);
+            outer.RegisterType<A>().InstancePerLifetimeScope();
+            outer.RegisterDelegate(c => new B(c.Resolve<A>())).UnsharedInstances();
 
-        //    var unused = inner.Resolve<C>();
-        //}
+            var inner = outer.BeginLifetimeScope();
 
-        //[Test]
-        //public void OuterInstancesCannotReferenceInner()
-        //{
-        //    var builder = new ContainerBuilder();
-        //    builder.Register<A>().WithScope(InstanceScope.Container);
-        //    builder.Register<B>().WithScope(InstanceScope.Factory);
+            var outerB = outer.Resolve<B>();
+            var innerB = inner.Resolve<B>();
+            var outerA = outer.Resolve<A>();
+            var innerA = inner.Resolve<A>();
 
-        //    var outer = builder.Build();
+            Assert.AreSame(innerA, innerB.A);
+            Assert.AreSame(outerA, outerB.A);
+            Assert.AreNotSame(innerA, outerA);
+            Assert.AreNotSame(innerB, outerB);
+        }
 
-        //    var inner = outer.CreateInnerContainer();
+        [Test]
+        public void IntegrationTest()
+        {
+            var container = new Container();
 
-        //    var outerB = outer.Resolve<B>();
-        //    var innerB = inner.Resolve<B>();
-        //    var outerA = outer.Resolve<A>();
-        //    var innerA = inner.Resolve<A>();
+            container.RegisterType<A>().SingleInstance();
+            
+            container.RegisterDelegate(ctr => new CD(ctr.Resolve<A>(), ctr.Resolve<B>()))
+                .As<IC, ID>()
+                .SingleInstance();
+            
+            container.RegisterDelegate(ctr => new E(ctr.Resolve<B>(), ctr.Resolve<IC>())).SingleInstance();
 
-        //    Assert.AreSame(innerA, innerB.A);
-        //    Assert.AreSame(outerA, outerB.A);
-        //    Assert.AreNotSame(innerA, outerA);
-        //    Assert.AreNotSame(innerB, outerB);
-        //}
+            container.RegisterDelegate(ctr => new B(ctr.Resolve<A>()))
+                .UnsharedInstances();
 
-        //[Test]
-        //public void IntegrationTest()
-        //{
-        //    var builder = new ContainerBuilder();
+            E e = container.Resolve<E>();
+            A a = container.Resolve<A>();
+            B b = container.Resolve<B>();
+            IC c = container.Resolve<IC>();
+            ID d = container.Resolve<ID>();
 
-        //    builder.Register<A>().WithScope(InstanceScope.Singleton);
-        //    builder.Register<CD>().As<IC, ID>().WithScope(InstanceScope.Singleton);
-        //    builder.Register<E>().WithScope(InstanceScope.Singleton);
-        //    builder.Register(ctr => new B(ctr.Resolve<A>()))
-        //        .WithScope(InstanceScope.Factory);
+            Assert.IsInstanceOfType(typeof(CD), c);
+            CD cd = (CD)c;
 
-        //    var target = builder.Build();
-
-        //    E e = target.Resolve<E>();
-        //    A a = target.Resolve<A>();
-        //    B b = target.Resolve<B>();
-        //    IC c = target.Resolve<IC>();
-        //    ID d = target.Resolve<ID>();
-
-        //    Assert.IsInstanceOfType(typeof(CD), c);
-        //    CD cd = (CD)c;
-
-        //    Assert.AreSame(a, b.A);
-        //    Assert.AreSame(a, cd.A);
-        //    Assert.AreNotSame(b, cd.B);
-        //    Assert.AreSame(c, e.C);
-        //    Assert.AreNotSame(b, e.B);
-        //    Assert.AreNotSame(e.B, cd.B);
-        //}
+            Assert.AreSame(a, b.A);
+            Assert.AreSame(a, cd.A);
+            Assert.AreNotSame(b, cd.B);
+            Assert.AreSame(c, e.C);
+            Assert.AreNotSame(b, e.B);
+            Assert.AreNotSame(e.B, cd.B);
+        }
 
         //[Test]
         //public void DisposeOrder1()

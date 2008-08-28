@@ -9,10 +9,6 @@ namespace Autofac.RegistrationSources
         {
             Id = Guid.NewGuid();
             Activator = Enforce.ArgumentNotNull(activator, "activator");
-            Ownership = InstanceOwnership.OwnedByLifetimeScope;
-            Lifetime = new RootScopeLifetime();
-            Sharing = InstanceSharing.Shared;
-            Services = new HashSet<Service>();
         }
 
         public virtual Guid Id { get; protected set; }

@@ -128,5 +128,11 @@ namespace Autofac
 
             return context.ComponentRegistry.IsRegistered(service);
         }
+
+        public static bool TryResolve(this IComponentContext context, string name, out object instance)
+        {
+            Enforce.ArgumentNotNull(context, "context");
+            return context.TryResolve(new NamedService(name), NoParameters, out instance);
+        }
     }
 }

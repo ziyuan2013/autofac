@@ -6,6 +6,7 @@ using Autofac.Registry;
 using Autofac.Lifetime;
 using Autofac.Services;
 using Autofac.Disposal;
+using Autofac.RegistrationSources;
 
 namespace Autofac.Tests
 {
@@ -319,7 +320,7 @@ namespace Autofac.Tests
         }
 
         [Test]
-        public void DisposeOrder1()
+        public void DisposeOrderIsInverseOfDependencyDirection1()
         {
             var target = new Container();
 
@@ -350,7 +351,7 @@ namespace Autofac.Tests
 
         // In this version, resolve order is reversed.
         [Test]
-        public void DisposeOrder2()
+        public void DisposeOrderIsInverseOfDependencyDirection2()
         {
             var target = new Container();
 
@@ -380,7 +381,7 @@ namespace Autofac.Tests
         }
 
         [Test]
-        public void ResolveSingletonFromContext()
+        public void ResolveSingletonFromNestedScopeGivesSameInstance()
         {
             var target = new Container();
 
@@ -406,7 +407,7 @@ namespace Autofac.Tests
         }
 
         [Test]
-        public void ResolveTransientFromContext()
+        public void ResolveTransientFromNestedScopeGivesNewInstance()
         {
             var target = new Container();
 
@@ -436,7 +437,7 @@ namespace Autofac.Tests
         }
 
         [Test]
-        public void ResolveScopedFromContext()
+        public void ResolveLifetimeScopeBoundFromNestedScopeGivesNewInstance()
         {
             var target = new Container();
 
@@ -471,52 +472,52 @@ namespace Autofac.Tests
             Assert.IsTrue(ctxA.IsDisposed);
         }
 
-        //class ObjectRegistrationSource : IRegistrationSource
-        //{
-        //    public bool TryGetRegistration(Service service, out IComponentRegistration registration)
-        //    {
-        //        Assert.AreEqual(typeof(object), ((TypedService)service).ServiceType);
-        //        registration = CreateRegistration(
-        //            new[] { service },
-        //            new ReflectionActivator(typeof(object)));
-        //        return true;
-        //    }
-        //}
+        class ObjectRegistrationSource : IDynamicRegistrationSource
+        {
+            public bool TryGetRegistration(Service service, out IComponentRegistration registration)
+            {
+                Assert.AreEqual(typeof(object), ((TypedService)service).ServiceType);
+                registration = CreateRegistration(
+                    new ReflectionActivator(typeof(object)),
+                    new[] { service });
+                return true;
+            }
+        }
 
-        //[Test]
-        //public void AddRegistrationInServiceNotRegistered()
-        //{
-        //    var c = new Container();
+        [Test]
+        public void RegistrationsAreAddedFromDynamicRegistrationSource()
+        {
+            var c = new Container();
 
-        //    Assert.IsFalse(c.IsRegistered<object>());
+            Assert.IsFalse(c.IsRegistered<object>());
 
-        //    c.AddRegistrationSource(new ObjectRegistrationSource());
+            c.ComponentRegistry.AddDynamicRegistrationSource(new ObjectRegistrationSource());
 
-        //    Assert.IsTrue(c.IsRegistered<object>());
+            Assert.IsTrue(c.IsRegistered<object>());
 
-        //    var o = c.Resolve<object>();
-        //    Assert.IsNotNull(o);
-        //}
+            var o = c.Resolve<object>();
+            Assert.IsNotNull(o);
+        }
 
-        //[Test]
-        //public void ResolveByName()
-        //{
-        //    string name = "name";
+        [Test]
+        public void ResolveByName()
+        {
+            string name = "name";
 
-        //    var r = CreateRegistration(
-        //        new Service[] { new NamedService(name) },
-        //        new ReflectionActivator(typeof(object)));
+            var r = CreateRegistration(
+                new ReflectionActivator(typeof(object)),
+                new Service[] { new NamedService(name) });
 
-        //    var c = new Container();
-        //    c.RegisterComponent(r);
+            var c = new Container();
+            c.RegisterComponent(r);
 
-        //    object o;
+            object o;
 
-        //    Assert.IsTrue(c.TryResolve(name, out o));
-        //    Assert.IsNotNull(o);
+            Assert.IsTrue(c.TryResolve(name, out o));
+            Assert.IsNotNull(o);
 
-        //    Assert.IsFalse(c.IsRegistered<object>());
-        //}
+            Assert.IsFalse(c.IsRegistered<object>());
+        }
 
         //class DependsByCtor
         //{

@@ -39,7 +39,7 @@ namespace Autofac.Lifetime
 
         public object Resolve(IComponentRegistration registration, IEnumerable<Parameter> parameters)
         {
-            var operation = new ResolveOperation(this, _componentRegistry);
+            var operation = new ResolveOperation(this);
             return operation.Resolve(registration, parameters);
         }
 

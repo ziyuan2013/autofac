@@ -11,17 +11,15 @@ namespace Autofac.Resolving
     // activations that go into producing a single requested object graph
     class ResolveOperation : IComponentContext, IResolveOperation
     {
-        IComponentRegistry _componentRegistry;
         Stack<ComponentActivation> _activationStack = new Stack<ComponentActivation>();
         ICollection<ComponentActivation> _successfulActivations;
         ISharingLifetimeScope _mostNestedLifetimeScope;
         CircularDependencyDetector _circularDependencyDetector = new CircularDependencyDetector();
         int _callDepth = 0;
 
-        public ResolveOperation(ISharingLifetimeScope mostNestedLifetimeScope, IComponentRegistry componentRegistry)
+        public ResolveOperation(ISharingLifetimeScope mostNestedLifetimeScope)
         {
             _mostNestedLifetimeScope = Enforce.ArgumentNotNull(mostNestedLifetimeScope, "mostNestedLifetimeScope");
-            _componentRegistry = Enforce.ArgumentNotNull(componentRegistry, "componentRegistry");
             ResetSuccessfulActivations();
         }
 
@@ -77,7 +75,7 @@ namespace Autofac.Resolving
 
         public IComponentRegistry ComponentRegistry
         {
-            get { return _componentRegistry; }
+            get { return _mostNestedLifetimeScope.ComponentRegistry; }
         }
     }
 }

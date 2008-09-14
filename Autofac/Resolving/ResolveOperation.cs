@@ -33,21 +33,16 @@ namespace Autofac.Resolving
             }
         }
 
-        public bool TryResolve(Service service, IEnumerable<Parameter> parameters, out object instance)
+        public object Resolve(IComponentRegistration registration, IEnumerable<Parameter> parameters)
         {
-            Enforce.ArgumentNotNull(service, "service");
+            Enforce.ArgumentNotNull(registration, "registration");
             Enforce.ArgumentNotNull(parameters, "parameters");
 
-            IComponentRegistration registration;
-            if (!_componentRegistry.TryGetRegistration(service, out registration))
-            {
-                instance = null;
-                return false;
-            }
+            _circularDependencyDetector.CheckForCircularDependency(registration, _activationStack);
 
-            _circularDependencyDetector.CheckForCircularDependency(service, _activationStack);
+            object instance = null;
 
-            var activation = new ComponentActivation(registration, service, this, CurrentActivationScope);
+            var activation = new ComponentActivation(registration, this, CurrentActivationScope);
 
             _activationStack.Push(activation);
             try
@@ -62,7 +57,7 @@ namespace Autofac.Resolving
 
             CompleteActivations();
 
-            return true;
+            return instance;
         }
 
         void CompleteActivations()

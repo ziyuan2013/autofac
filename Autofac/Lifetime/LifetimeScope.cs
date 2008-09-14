@@ -4,6 +4,7 @@ using Autofac.Resolving;
 using Autofac.Registry;
 using Autofac.Disposal;
 using Autofac.Services;
+using Autofac.SelfRegistration;
 
 namespace Autofac.Lifetime
 {
@@ -31,13 +32,15 @@ namespace Autofac.Lifetime
 
         public ILifetimeScope BeginLifetimeScope()
         {
-            return new LifetimeScope(_componentRegistry, this);
+            var result = new LifetimeScope(_componentRegistry, this);
+            result.Resolve<IndirectReference<ILifetimeScope>>().Value = result;
+            return result;
         }
 
-        public bool TryResolve(Service service, IEnumerable<Parameter> parameters, out object instance)
+        public object Resolve(IComponentRegistration registration, IEnumerable<Parameter> parameters)
         {
             var operation = new ResolveOperation(this, _componentRegistry);
-            return operation.TryResolve(service, parameters, out instance);
+            return operation.Resolve(registration, parameters);
         }
 
         public ISharingLifetimeScope ParentLifetimeScope

@@ -10,7 +10,6 @@ namespace Autofac.Resolving
     class ComponentActivation
     {
         IComponentRegistration _registration;
-        Service _requestedService;
         IComponentContext _context;
         ISharingLifetimeScope _mostNestedVisibleScope;
         ISharingLifetimeScope _activationScope;
@@ -18,17 +17,13 @@ namespace Autofac.Resolving
 
         public ComponentActivation(
             IComponentRegistration registration,
-            Service requestedService,
             IComponentContext context,
             ISharingLifetimeScope mostNestedVisibleScope)
         {
             _registration = Enforce.ArgumentNotNull(registration, "registration");
-            _requestedService = Enforce.ArgumentNotNull(requestedService, "requestedService");
             _context = Enforce.ArgumentNotNull(context, "context");
             _mostNestedVisibleScope = Enforce.ArgumentNotNull(mostNestedVisibleScope, "mostNestedVisibleScope");
         }
-
-        public Service RequestedService { get { return _requestedService; } }
 
         public IComponentRegistration Registration { get { return _registration; } }
 

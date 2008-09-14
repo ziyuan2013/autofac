@@ -7,6 +7,7 @@ using Autofac.Lifetime;
 using Autofac.Services;
 using Autofac.Disposal;
 using Autofac.RegistrationSources;
+using System.Linq;
 
 namespace Autofac.Tests
 {
@@ -598,56 +599,89 @@ namespace Autofac.Tests
         //    var dbc = c.Resolve<DependsByCtor>();
         //}
 
-        //class Parameterised
-        //{
-        //    public string A { get; private set; }
-        //    public int B { get; private set; }
+        class Parameterised
+        {
+            public string A { get; private set; }
+            public int B { get; private set; }
 
-        //    public Parameterised(string a, int b)
-        //    {
-        //        A = a;
-        //        B = b;
-        //    }
-        //}
+            public Parameterised(string a, int b)
+            {
+                A = a;
+                B = b;
+            }
+        }
 
-        //[Test]
-        //public void RegisterParameterisedWithDelegate()
-        //{
-        //    var cb = new ContainerBuilder();
-        //    cb.Register((c, p) => new Parameterised(p.Get<string>("a"), p.Get<int>("b")));
-        //    var container = cb.Build();
-        //    var aVal = "Hello";
-        //    var bVal = 42;
-        //    var result = container.Resolve<Parameterised>(
-        //        new Parameter("a", aVal),
-        //        new Parameter("b", bVal));
-        //    Assert.IsNotNull(result);
-        //    Assert.AreEqual(aVal, result.A);
-        //    Assert.AreEqual(bVal, result.B);
-        //}
+        [Test]
+        public void CanExplicitlyRetrieveNamedParameters()
+        {
+            var container = new Container();
+            container.RegisterDelegate(
+                (c, p) => new Parameterised(p.Named<string>("a"), p.Named<int>("b")));
+            var aVal = "Hello";
+            var bVal = 42;
+            var result = container.Resolve<Parameterised>(
+                new Parameter[] { 
+                    new NamedParameter("a", aVal),
+                    new NamedParameter("b", bVal)});
+            Assert.IsNotNull(result);
+            Assert.AreEqual(aVal, result.A);
+            Assert.AreEqual(bVal, result.B);
+        }
 
-        //[Test]
-        //public void RegisterParameterisedWithReflection()
-        //{
-        //    var cb = new ContainerBuilder();
-        //    cb.Register<Parameterised>();
-        //    var container = cb.Build();
-        //    var aVal = "Hello";
-        //    var bVal = 42;
-        //    var result = container.Resolve<Parameterised>(
-        //        new Parameter("a", aVal),
-        //        new Parameter("b", bVal));
-        //    Assert.IsNotNull(result);
-        //    Assert.AreEqual(aVal, result.A);
-        //    Assert.AreEqual(bVal, result.B);
-        //}
+        [Test]
+        public void CanExplicitlyRetrievePositionalParameters()
+        {
+            var container = new Container();
+            container.RegisterDelegate(
+                (c, p) => new Parameterised(p.Positional<string>(0), p.Positional<int>(1)));
+            var aVal = "Hello";
+            var bVal = 42;
+            var result = container.Resolve<Parameterised>(
+                new Parameter[] { 
+                    new PositionalParameter(0, aVal),
+                    new PositionalParameter(1, bVal)});
+            Assert.IsNotNull(result);
+            Assert.AreEqual(aVal, result.A);
+            Assert.AreEqual(bVal, result.B);
+        }
+
+        [Test]
+        public void CanRetrieveNamedParametersViaReflection()
+        {
+            var container = new Container();
+            container.RegisterType<Parameterised>();
+            var aVal = "Hello";
+            var bVal = 42;
+            var result = container.Resolve<Parameterised>(
+                new Parameter[] { 
+                    new NamedParameter("a", aVal),
+                    new NamedParameter("b", bVal)});
+            Assert.IsNotNull(result);
+            Assert.AreEqual(aVal, result.A);
+            Assert.AreEqual(bVal, result.B);
+        }
+
+        [Test]
+        public void CanRetrieveMixedParametersViaReflection()
+        {
+            var container = new Container();
+            container.RegisterType<Parameterised>();
+            var aVal = "Hello";
+            var bVal = 42;
+            var result = container.Resolve<Parameterised>(
+                new Parameter[] {
+                    new PositionalParameter(1, bVal),
+                    new NamedParameter("a", aVal)});
+            Assert.IsNotNull(result);
+            Assert.AreEqual(aVal, result.A);
+            Assert.AreEqual(bVal, result.B);
+        }
 
         //[Test]
         //public void SupportsIServiceProvider()
         //{
-        //    var cb = new ContainerBuilder();
-        //    cb.Register<object>();
-        //    var container = cb.Build();
+        //    var container = new Container();
+        //    container.RegisterType<object>();
         //    var sp = (IServiceProvider)container;
         //    var o = sp.GetService(typeof(object));
         //    Assert.IsNotNull(o);
@@ -655,33 +689,37 @@ namespace Autofac.Tests
         //    Assert.IsNull(s);
         //}
 
-        //[Test]
-        //public void ResolveByNameWithServiceType()
-        //{
-        //    var myName = "Something";
-        //    var cb = new ContainerBuilder();
-        //    cb.Register<object>().Named(myName);
-        //    var container = cb.Build();
-        //    var o = container.Resolve<object>(myName);
-        //    Assert.IsNotNull(o);
-        //}
+        [Test]
+        public void ResolveByNameWithServiceType()
+        {
+            var myName = "Something";
+            var container = new Container();
+            container.RegisterType<object>().Named(myName);
+            var o = container.Resolve<object>(myName);
+            Assert.IsNotNull(o);
+        }
 
-        //[Test]
-        //public void ComponentRegistrationsExposed()
-        //{
-        //    var builder = new ContainerBuilder();
-        //    builder.Register<object>();
-        //    builder.Register<object>();
-        //    builder.Register("hello");
-        //    var container = builder.Build();
-        //    var registrations = new List<IComponentRegistration>(container.ComponentRegistrations);
-        //    // The container registers itself :) hence 3 + 1.
-        //    Assert.AreEqual(4, registrations.Count);
-        //    Assert.IsTrue(registrations[0].Descriptor.Services.Contains(new TypedService(typeof(IContainer))));
-        //    Assert.IsTrue(registrations[1].Descriptor.Services.Contains(new TypedService(typeof(object))));
-        //    Assert.IsTrue(registrations[2].Descriptor.Services.Contains(new TypedService(typeof(object))));
-        //    Assert.IsTrue(registrations[3].Descriptor.Services.Contains(new TypedService(typeof(string))));
-        //}
+        [Test]
+        public void ComponentRegistrationsExposed()
+        {
+            var container = new Container();
+            container.RegisterType<object>();
+            container.RegisterType<object>();
+            container.RegisterInstance("hello");
+            var registrations = new List<IComponentRegistration>(container.ComponentRegistry.Registrations);
+
+            // The container registers itself using a bit of indirection.
+            Assert.AreEqual(5, registrations.Count);
+
+            // zero is unimportant
+
+            Assert.IsTrue(registrations[1].Services.Contains(new TypedService(typeof(IComponentContext))));
+            Assert.IsTrue(registrations[1].Services.Contains(new TypedService(typeof(ILifetimeScope))));
+
+            Assert.IsTrue(registrations[2].Services.Contains(new TypedService(typeof(object))));
+            Assert.IsTrue(registrations[3].Services.Contains(new TypedService(typeof(object))));
+            Assert.IsTrue(registrations[4].Services.Contains(new TypedService(typeof(string))));
+        }
 
         //[Test]
         //public void ComponentRegisteredEventFired()

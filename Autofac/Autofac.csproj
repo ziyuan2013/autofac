@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{BA592149-0F4B-4956-962C-79CB3367DC7F}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -51,18 +51,24 @@
     <Compile Include="Activators\InstanceActivator.cs" />
     <Compile Include="Activators\ProvidedInstanceActivator.cs" />
     <Compile Include="Activators\ReflectionActivator.cs" />
+    <Compile Include="Injection\AutowiringParameter.cs" />
     <Compile Include="ComponentNotRegisteredException.cs" />
     <Compile Include="ComponentNotRegisteredExceptionResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ComponentNotRegisteredExceptionResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ConstantParameter.cs" />
     <Compile Include="DependencyResolutionException.cs" />
     <Compile Include="DependencyResolutionExceptionResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>DependencyResolutionExceptionResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Injection\ConstructorBinding.cs" />
+    <Compile Include="NamedParameter.cs" />
+    <Compile Include="PositionalParameter.cs" />
+    <Compile Include="ParameterExtensions.cs" />
     <Compile Include="RegistrationSources\IDynamicRegistrationSource.cs" />
     <Compile Include="Lifetime\MatchingScopeLifetimeResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -99,6 +105,7 @@
     </Compile>
     <Compile Include="RegistrationSources\IDeferredRegistrationSource.cs" />
     <Compile Include="Lifetime\MatchingScopeLifetime.cs" />
+    <Compile Include="SelfRegistration\IndirectReference.cs" />
     <Compile Include="Services\NamedService.cs" />
     <Compile Include="Parameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

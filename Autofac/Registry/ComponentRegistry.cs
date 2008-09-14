@@ -72,11 +72,7 @@ namespace Autofac.Registry
                 _defaultRegistrations[service] = registration;
                 _unregisteredServices.Remove(service);
             }
-        }
-
-        public IEnumerable<IComponentRegistration> GetRegistrationsProviding(Service service)
-        {
-            throw new NotImplementedException();
+            _registrations.Add(registration);
         }
 
         public IEnumerable<IComponentRegistration> Registrations

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
+using Autofac.Injection;
 
 namespace Autofac.Activators
 {
@@ -18,7 +21,42 @@ namespace Autofac.Activators
             Enforce.ArgumentNotNull(context, "context");
             Enforce.ArgumentNotNull(parameters, "parameters");
 
-            return Activator.CreateInstance(_implementationType);
+            var constructorBindings = GetConstructorBindings(
+                context,
+                parameters,
+                _implementationType.FindMembers(
+                    MemberTypes.Constructor,
+                    BindingFlags.Instance | BindingFlags.Public,
+                    null,
+                    null).Cast<ConstructorInfo>());
+
+            var selectedBinding = SelectConstructorBinding(constructorBindings);
+
+            return selectedBinding.Instantiate();
+        }
+
+        private ConstructorBinding SelectConstructorBinding(
+            IEnumerable<ConstructorBinding> constructorBindings)
+        {
+            Enforce.ArgumentNotNull(constructorBindings, "constructorBindings");
+            return constructorBindings.First();
+        }
+
+        private IEnumerable<ConstructorBinding> GetConstructorBindings(
+            IComponentContext context,
+            IEnumerable<Parameter> parameters,
+            IEnumerable<ConstructorInfo> constructorInfo)
+        {
+            Enforce.ArgumentNotNull(context, "context");
+            Enforce.ArgumentNotNull(parameters, "parameters");
+            Enforce.ArgumentNotNull(constructorInfo, "constructorInfo");
+
+            // TODO: also concat with configured parameters...
+            var prioritisedParameters =
+                parameters.Concat(new Parameter[] { new AutowiringParameter() });
+
+            return constructorInfo.Select(
+                ci => new ConstructorBinding(ci, prioritisedParameters, context));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac.Services;
+using Autofac.Registry;
 
 namespace Autofac
 {
@@ -16,6 +17,16 @@ namespace Autofac
         public static T Resolve<T>(this IComponentContext context, Guid registrationId, IEnumerable<Parameter> parameters)
         {
             return (T)Resolve(context, new UniqueService(registrationId), parameters);
+        }
+
+        public static T Resolve<T>(this IComponentContext context, string name)
+        {
+            return Resolve<T>(context, name, NoParameters);
+        }
+
+        public static T Resolve<T>(this IComponentContext context, string name, IEnumerable<Parameter> parameters)
+        {
+            return (T)Resolve(context, new NamedService(name), parameters);
         }
 
         public static T Resolve<T>(this IComponentContext context)
@@ -127,6 +138,25 @@ namespace Autofac
             Enforce.ArgumentNotNull(service, "service");
 
             return context.ComponentRegistry.IsRegistered(service);
+        }
+
+        public static bool TryResolve(this IComponentContext context, Service service, IEnumerable<Parameter> parameters, out object instance)
+        {
+            IComponentRegistration registration;
+            if (!context.ComponentRegistry.TryGetRegistration(service, out registration))
+            {
+                instance = null;
+                return false;
+            }
+
+            instance = context.Resolve(registration, parameters);
+            return true;
+        }
+
+        public static bool TryResolve(this IComponentContext context, Type type, out object instance)
+        {
+            Enforce.ArgumentNotNull(context, "context");
+            return context.TryResolve(new TypedService(type), NoParameters, out instance);
         }
 
         public static bool TryResolve(this IComponentContext context, string name, out object instance)

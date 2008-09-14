@@ -43,5 +43,11 @@ namespace Autofac.Registry
         public IEnumerable<Service> Services { get; private set; }
 
         public IDictionary<string, object> ExtendedProperties { get; private set; }
+
+        public override string ToString()
+        {
+            // Temporary...
+            return Activator.BestGuessImplementationType.ToString();
+        }
     }
 }

@@ -8,6 +8,6 @@ namespace Autofac
     {
         IComponentRegistry ComponentRegistry { get; }
 
-        bool TryResolve(Service service, IEnumerable<Parameter> parameters, out object instance);
+        object Resolve(IComponentRegistration registration, IEnumerable<Parameter> parameters);
     }
 }

@@ -4,39 +4,40 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 using Autofac.Services;
+using Autofac.Registry;
 
 namespace Autofac.Resolving
 {
     class CircularDependencyDetector
     {
-        string CreateDependencyGraphTo(Service service, Stack<ComponentActivation> activationStack)
+        string CreateDependencyGraphTo(IComponentRegistration registration, Stack<ComponentActivation> activationStack)
         {
-            Enforce.ArgumentNotNull(service, "service");
+            Enforce.ArgumentNotNull(registration, "registration");
             Enforce.ArgumentNotNull(activationStack, "activationStack");
 
-            string dependencyGraph = service.Description;
+            string dependencyGraph = registration.ToString();
 
-            foreach (Service requestor in activationStack.Select(a => a.RequestedService))
-                dependencyGraph = requestor.Description + " -> " + dependencyGraph;
+            foreach (IComponentRegistration requestor in activationStack.Select(a => a.Registration))
+                dependencyGraph = requestor.ToString() + " -> " + dependencyGraph;
 
             return dependencyGraph;
         }
 
-        public void CheckForCircularDependency(Service service, Stack<ComponentActivation> activationStack)
+        public void CheckForCircularDependency(IComponentRegistration registration, Stack<ComponentActivation> activationStack)
         {
-            Enforce.ArgumentNotNull(service, "service");
+            Enforce.ArgumentNotNull(registration, "registration");
             Enforce.ArgumentNotNull(activationStack, "activationStack");
 
-            if (IsCircularDependency(service, activationStack))
+            if (IsCircularDependency(registration, activationStack))
                 throw new DependencyResolutionException(string.Format(CultureInfo.CurrentCulture,
-                    CircularDependencyDetectorResources.CircularDependency, CreateDependencyGraphTo(service, activationStack)));
+                    CircularDependencyDetectorResources.CircularDependency, CreateDependencyGraphTo(registration, activationStack)));
         }
 
-        bool IsCircularDependency(Service service, Stack<ComponentActivation> activationStack)
+        bool IsCircularDependency(IComponentRegistration registration, Stack<ComponentActivation> activationStack)
         {
-            Enforce.ArgumentNotNull(service, "service");
+            Enforce.ArgumentNotNull(registration, "registration");
             Enforce.ArgumentNotNull(activationStack, "activationStack");
-            return activationStack.Count(a => a.RequestedService == service) >= 1;
+            return activationStack.Count(a => a.Registration == registration) >= 1;
         }
     }
 }

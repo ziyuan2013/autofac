@@ -7,7 +7,7 @@ using Autofac.Services;
 
 namespace Autofac.Registry
 {
-    class ComponentRegistry : Disposable, IComponentRegistry
+    public class ComponentRegistry : Disposable, IComponentRegistry
     {
         ICollection<Service> _unregisteredServices = new HashSet<Service>();
         ICollection<IDeferredRegistrationSource> _registrationSources = new List<IDeferredRegistrationSource>();
@@ -67,12 +67,16 @@ namespace Autofac.Registry
         public void Register(IComponentRegistration registration)
         {
             Enforce.ArgumentNotNull(registration, "registration");
+            
             foreach (var service in registration.Services)
             {
                 _defaultRegistrations[service] = registration;
                 _unregisteredServices.Remove(service);
             }
+            
             _registrations.Add(registration);
+
+            Registered(this, new ComponentRegisteredEventArgs(this, registration));
         }
 
         public IEnumerable<IComponentRegistration> Registrations

@@ -4,6 +4,7 @@ using Autofac.Lifetime;
 using Autofac.Disposal;
 using Autofac.Services;
 using Autofac.Activators;
+using Autofac.Events;
 
 namespace Autofac.Registry
 {
@@ -22,5 +23,14 @@ namespace Autofac.Registry
         IEnumerable<Service> Services { get; }
 
         IDictionary<string, object> ExtendedProperties { get; }
+
+        event EventHandler<ActivatingEventArgs<object>> Activating;
+
+        // Temporary :)
+        void RaiseActivating(IComponentContext activationContext, object instance);
+
+        event EventHandler<ActivatedEventArgs<object>> Activated;
+
+        void RaiseActivated(IComponentContext activationContext, object instance);
     }
 }

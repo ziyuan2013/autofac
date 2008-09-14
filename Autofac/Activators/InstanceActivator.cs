@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Autofac.Lifetime;
+using Autofac.Events;
 
 namespace Autofac.Activators
 {
@@ -14,16 +15,6 @@ namespace Autofac.Activators
         {
             _bestGuessImplementationType = Enforce.ArgumentNotNull(bestGuessImplementationType, "bestGuessImplementationType");
         }
-
-        public void CompleteActivation(object newInstance, ISharingLifetimeScope activationScope)
-        {
-        }
-
-        public event EventHandler Preparing = (s, e) => { };
-
-        public event EventHandler Activating = (s, e) => { };
-
-        public event EventHandler Activated = (s, e) => { };
 
         public Type BestGuessImplementationType
         {

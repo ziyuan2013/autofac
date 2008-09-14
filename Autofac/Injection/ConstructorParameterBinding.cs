@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Autofac.Injection
 {
-    public class ConstructorBinding
+    public class ConstructorParameterBinding
     {
         Func<object>[] _valueRetrievers;
 
@@ -19,7 +19,7 @@ namespace Autofac.Injection
         public bool CanInstantiate { get; private set; }
 
         // Ugly, too much work in ctor
-        public ConstructorBinding(
+        public ConstructorParameterBinding(
             ConstructorInfo ci,
             IEnumerable<Parameter> availableParameters,
             IComponentContext context)

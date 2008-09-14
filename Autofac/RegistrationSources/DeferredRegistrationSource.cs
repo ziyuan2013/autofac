@@ -27,6 +27,12 @@ namespace Autofac.RegistrationSources
                 _registrationData.Services,
                 _registrationData.ExtendedProperties);
 
+            foreach (var handler in _registrationData.ActivatingHandlers)
+                registration.Activating += handler;
+
+            foreach (var handler in _registrationData.ActivatedHandlers)
+                registration.Activated += handler;
+
             _used = true;
             return registration;
         }

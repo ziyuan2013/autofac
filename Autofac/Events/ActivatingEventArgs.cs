@@ -24,30 +24,42 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using Autofac.Registry;
 
-namespace Autofac.Registry
+namespace Autofac.Events
 {
     /// <summary>
-    /// Information about the ocurrence of a component being registered
-    /// with a container.
+    /// Fired when the activation process for a new instance is complete.
     /// </summary>
-    public class ComponentRegisteredEventArgs : EventArgs
+    public class ActivatingEventArgs<T> : EventArgs
     {
         /// <summary>
-        /// The component registration.
+        /// Initializes a new instance of the <see cref="ActivatedEventArgs"/> class.
         /// </summary>
-        public IComponentRegistration ComponentRegistration { get; private set; }
-
-        public IComponentRegistry ComponentRegistry { get; private set; }
+        /// <param name="context">The context.</param>
+        /// <param name="component">The component.</param>
+        /// <param name="instance">The instance.</param>
+        public ActivatingEventArgs(IComponentContext context, IComponentRegistration component, T instance)
+        {
+            Context = Enforce.ArgumentNotNull(context, "context");
+            Component = Enforce.ArgumentNotNull(component, "component");
+            Enforce.ArgumentNotNull((object)instance, "instance");
+            Instance = instance;
+        }
 
         /// <summary>
-        /// Create a new instance with a valid component registration.
+        /// The context in which the activation occurred.
         /// </summary>
-        /// <param name="componentRegistration">The component registration.</param>
-        public ComponentRegisteredEventArgs(IComponentRegistry registry, IComponentRegistration componentRegistration)
-        {
-            ComponentRegistry = Enforce.ArgumentNotNull(registry, "registry");
-            ComponentRegistration = Enforce.ArgumentNotNull(componentRegistration, "componentRegistration");
-        }
+        public IComponentContext Context { get; private set; }
+
+        /// <summary>
+        /// The component providing the instance.
+        /// </summary>
+        public IComponentRegistration Component { get; private set; }
+
+        /// <summary>
+        /// The instance that will be used to satisfy the request.
+        /// </summary>
+        public T Instance { get; private set; }
     }
 }

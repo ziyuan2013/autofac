@@ -7,14 +7,17 @@ using Autofac.Services;
 
 namespace Autofac.Resolving
 {
-    class ResolveOperation : IComponentContext
+    // Is a component context that sequences and monitors the multiple
+    // activations that go into producing a single requested object graph
+    class ResolveOperation : IComponentContext, IResolveOperation
     {
         IComponentRegistry _componentRegistry;
         Stack<ComponentActivation> _activationStack = new Stack<ComponentActivation>();
         ICollection<ComponentActivation> _successfulActivations;
         ISharingLifetimeScope _mostNestedLifetimeScope;
         CircularDependencyDetector _circularDependencyDetector = new CircularDependencyDetector();
-        
+        int _callDepth = 0;
+
         public ResolveOperation(ISharingLifetimeScope mostNestedLifetimeScope, IComponentRegistry componentRegistry)
         {
             _mostNestedLifetimeScope = Enforce.ArgumentNotNull(mostNestedLifetimeScope, "mostNestedLifetimeScope");
@@ -22,27 +25,22 @@ namespace Autofac.Resolving
             ResetSuccessfulActivations();
         }
 
-        ISharingLifetimeScope CurrentActivationScope
-        {
-            get
-            {
-                if (_activationStack.Any())
-                    return _activationStack.Peek().ActivationScope;
-                else
-                    return _mostNestedLifetimeScope;
-            }
-        }
-
         public object Resolve(IComponentRegistration registration, IEnumerable<Parameter> parameters)
         {
+            return Resolve(_mostNestedLifetimeScope, registration, parameters);
+        }
+
+        public object Resolve(ISharingLifetimeScope activationScope, IComponentRegistration registration, IEnumerable<Parameter> parameters)
+        {
+            Enforce.ArgumentNotNull(activationScope, "activationScope");
             Enforce.ArgumentNotNull(registration, "registration");
             Enforce.ArgumentNotNull(parameters, "parameters");
 
-            _circularDependencyDetector.CheckForCircularDependency(registration, _activationStack);
+            _circularDependencyDetector.CheckForCircularDependency(registration, _activationStack, ++_callDepth);
 
             object instance = null;
 
-            var activation = new ComponentActivation(registration, this, CurrentActivationScope);
+            var activation = new ComponentActivation(registration, this, activationScope);
 
             _activationStack.Push(activation);
             try
@@ -55,7 +53,10 @@ namespace Autofac.Resolving
                 _activationStack.Pop();
             }
 
-            CompleteActivations();
+            if (_activationStack.Count == 0)
+                CompleteActivations();
+
+            --_callDepth;
 
             return instance;
         }

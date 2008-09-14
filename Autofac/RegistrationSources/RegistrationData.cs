@@ -2,6 +2,8 @@
 using Autofac.Lifetime;
 using Autofac.Services;
 using Autofac.Disposal;
+using Autofac.Events;
+using System;
 
 namespace Autofac.RegistrationSources
 {
@@ -14,6 +16,8 @@ namespace Autofac.RegistrationSources
             Sharing = InstanceSharing.Shared;
             Services = new HashSet<Service>();
             ExtendedProperties = new Dictionary<string, object>();
+            ActivatingHandlers = new List<EventHandler<ActivatingEventArgs<object>>>();
+            ActivatedHandlers = new List<EventHandler<ActivatedEventArgs<object>>>();
         }
 
         public virtual ICollection<Service> Services { get; protected set; }
@@ -25,5 +29,9 @@ namespace Autofac.RegistrationSources
         public virtual InstanceSharing Sharing { get; protected set; }
 
         public virtual IDictionary<string, object> ExtendedProperties { get; protected set; }
+
+        public virtual ICollection<EventHandler<ActivatingEventArgs<object>>> ActivatingHandlers { get; protected set; }
+
+        public virtual ICollection<EventHandler<ActivatedEventArgs<object>>> ActivatedHandlers { get; protected set; }
     }
 }

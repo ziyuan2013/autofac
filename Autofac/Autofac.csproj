@@ -51,6 +51,8 @@
     <Compile Include="Activators\InstanceActivator.cs" />
     <Compile Include="Activators\ProvidedInstanceActivator.cs" />
     <Compile Include="Activators\ReflectionActivator.cs" />
+    <Compile Include="Events\ActivatedEventArgs.cs" />
+    <Compile Include="Events\ActivatingEventArgs.cs" />
     <Compile Include="Injection\AutowiringParameter.cs" />
     <Compile Include="ComponentNotRegisteredException.cs" />
     <Compile Include="ComponentNotRegisteredExceptionResources.Designer.cs">
@@ -65,7 +67,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DependencyResolutionExceptionResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Injection\ConstructorBinding.cs" />
+    <Compile Include="Injection\AutowiringPropertyInjector.cs" />
+    <Compile Include="Injection\ConstructorParameterBinding.cs" />
     <Compile Include="NamedParameter.cs" />
     <Compile Include="PositionalParameter.cs" />
     <Compile Include="ParameterExtensions.cs" />
@@ -105,6 +108,7 @@
     </Compile>
     <Compile Include="RegistrationSources\IDeferredRegistrationSource.cs" />
     <Compile Include="Lifetime\MatchingScopeLifetime.cs" />
+    <Compile Include="Resolving\IResolveOperation.cs" />
     <Compile Include="SelfRegistration\IndirectReference.cs" />
     <Compile Include="Services\NamedService.cs" />
     <Compile Include="Parameter.cs" />

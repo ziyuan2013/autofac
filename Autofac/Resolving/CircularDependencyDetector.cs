@@ -10,6 +10,11 @@ namespace Autofac.Resolving
 {
     class CircularDependencyDetector
     {
+        /// <summary>
+        /// Catch circular dependencies that are triggered by post-resolve processing (e.g. 'OnActivated')
+        /// </summary>
+        const int MaxResolveDepth = 100;
+
         string CreateDependencyGraphTo(IComponentRegistration registration, Stack<ComponentActivation> activationStack)
         {
             Enforce.ArgumentNotNull(registration, "registration");
@@ -23,10 +28,14 @@ namespace Autofac.Resolving
             return dependencyGraph;
         }
 
-        public void CheckForCircularDependency(IComponentRegistration registration, Stack<ComponentActivation> activationStack)
+        public void CheckForCircularDependency(IComponentRegistration registration, Stack<ComponentActivation> activationStack, int callDepth)
         {
             Enforce.ArgumentNotNull(registration, "registration");
             Enforce.ArgumentNotNull(activationStack, "activationStack");
+
+            if (callDepth > MaxResolveDepth)
+                throw new DependencyResolutionException(string.Format(CultureInfo.CurrentCulture,
+                    CircularDependencyDetectorResources.MaxDepthExceeded, registration));
 
             if (IsCircularDependency(registration, activationStack))
                 throw new DependencyResolutionException(string.Format(CultureInfo.CurrentCulture,

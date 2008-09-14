@@ -520,84 +520,69 @@ namespace Autofac.Tests
             Assert.IsFalse(c.IsRegistered<object>());
         }
 
-        //class DependsByCtor
-        //{
-        //    public DependsByCtor(DependsByProp o)
-        //    {
-        //        Dep = o;
-        //    }
+        class DependsByCtor
+        {
+            public DependsByCtor(DependsByProp o)
+            {
+                Dep = o;
+            }
 
-        //    public DependsByProp Dep { get; private set; }
-        //}
+            public DependsByProp Dep { get; private set; }
+        }
 
-        //class DependsByProp
-        //{
-        //    public DependsByCtor Dep { get; set; }
-        //}
+        class DependsByProp
+        {
+            public DependsByCtor Dep { get; set; }
+        }
 
-        //[Test]
-        //public void CtorPropDependencyOkOrder1()
-        //{
-        //    var cb = new ContainerBuilder();
-        //    cb.Register<DependsByCtor>();
-        //    cb.Register<DependsByProp>()
-        //        .OnActivated(ActivatedHandler.InjectProperties);
+        [Test]
+        public void CtorPropDependencyOkOrder1()
+        {
+            var c = new Container();
+            c.RegisterType<DependsByCtor>();
+            c.RegisterType<DependsByProp>().PropertiesAutowired(true);
 
-        //    var c = cb.Build();
-        //    var dbp = c.Resolve<DependsByProp>();
+            var dbp = c.Resolve<DependsByProp>();
 
-        //    Assert.IsNotNull(dbp.Dep);
-        //    Assert.IsNotNull(dbp.Dep.Dep);
-        //    Assert.AreSame(dbp, dbp.Dep.Dep);
-        //}
+            Assert.IsNotNull(dbp.Dep);
+            Assert.IsNotNull(dbp.Dep.Dep);
+            Assert.AreSame(dbp, dbp.Dep.Dep);
+        }
 
-        //[Test]
-        //public void CtorPropDependencyOkOrder2()
-        //{
-        //    var cb = new ContainerBuilder();
-        //    cb.Register<DependsByCtor>();
-        //    cb.Register<DependsByProp>()
-        //        .OnActivated(ActivatedHandler.InjectProperties);
+        [Test]
+        public void CtorPropDependencyOkOrder2()
+        {
+            var c = new Container();
+            c.RegisterType<DependsByCtor>();
+            c.RegisterType<DependsByProp>().PropertiesAutowired(true);
 
-        //    var c = cb.Build();
-        //    var dbc = c.Resolve<DependsByCtor>();
+            var dbc = c.Resolve<DependsByCtor>();
 
-        //    Assert.IsNotNull(dbc.Dep);
-        //    Assert.IsNotNull(dbc.Dep.Dep);
-        //    Assert.AreSame(dbc, dbc.Dep.Dep);
-        //}
+            Assert.IsNotNull(dbc.Dep);
+            Assert.IsNotNull(dbc.Dep.Dep);
+            Assert.AreSame(dbc, dbc.Dep.Dep);
+        }
 
-        //[Test]
-        //[ExpectedException(typeof(DependencyResolutionException))]
-        //public void CtorPropDependencyFactoriesOrder1()
-        //{
-        //    var cb = new ContainerBuilder();
-        //    using (cb.SetDefaultScope(InstanceScope.Factory))
-        //    {
-        //        cb.Register<DependsByCtor>();
-        //        cb.Register<DependsByProp>()
-        //            .OnActivated(ActivatedHandler.InjectProperties);
-        //    }
+        [Test]
+        [ExpectedException(typeof(DependencyResolutionException))]
+        public void CtorPropDependencyFactoriesOrder1()
+        {
+            var c = new Container();
+            c.RegisterType<DependsByCtor>().UnsharedInstances();
+            c.RegisterType<DependsByProp>().UnsharedInstances().PropertiesAutowired(true);
+            var dbp = c.Resolve<DependsByProp>();
+        }
 
-        //    var c = cb.Build();
-        //    var dbp = c.Resolve<DependsByProp>();
-        //}
+        [Test]
+        [ExpectedException(typeof(DependencyResolutionException))]
+        public void CtorPropDependencyFactoriesOrder2()
+        {
+            var c = new Container();
+            c.RegisterType<DependsByCtor>().UnsharedInstances();
+            c.RegisterType<DependsByProp>().UnsharedInstances().PropertiesAutowired(true);
 
-        //[Test]
-        //[ExpectedException(typeof(DependencyResolutionException))]
-        //public void CtorPropDependencyFactoriesOrder2()
-        //{
-        //    var cb = new ContainerBuilder();
-        //    using (cb.SetDefaultScope(InstanceScope.Factory))
-        //    {
-        //        cb.Register<DependsByCtor>();
-        //        cb.Register<DependsByProp>()
-        //            .OnActivated(ActivatedHandler.InjectProperties);
-        //    }
-
-        //    var c = cb.Build();
-        //    var dbc = c.Resolve<DependsByCtor>();
-        //}
+            var dbc = c.Resolve<DependsByCtor>();
+        }
 
         class Parameterised
         {
@@ -677,18 +662,6 @@ namespace Autofac.Tests
             Assert.AreEqual(bVal, result.B);
         }
 
-        //[Test]
-        //public void SupportsIServiceProvider()
-        //{
-        //    var container = new Container();
-        //    container.RegisterType<object>();
-        //    var sp = (IServiceProvider)container;
-        //    var o = sp.GetService(typeof(object));
-        //    Assert.IsNotNull(o);
-        //    var s = sp.GetService(typeof(string));
-        //    Assert.IsNull(s);
-        //}
-
         [Test]
         public void ResolveByNameWithServiceType()
         {
@@ -721,101 +694,160 @@ namespace Autofac.Tests
             Assert.IsTrue(registrations[4].Services.Contains(new TypedService(typeof(string))));
         }
 
-        //[Test]
-        //public void ComponentRegisteredEventFired()
-        //{
-        //    object eventSender = null;
-        //    ComponentRegisteredEventArgs args = null;
-        //    var eventCount = 0;
+        [Test]
+        public void ComponentRegisteredEventFired()
+        {
+            object eventSender = null;
+            ComponentRegisteredEventArgs args = null;
+            var eventCount = 0;
 
-        //    var container = new Container();
-        //    container.ComponentRegistered += (sender, e) =>
-        //    {
-        //        eventSender = sender;
-        //        args = e;
-        //        ++eventCount;
-        //    };
+            var container = new Container();
+            container.ComponentRegistry.Registered += (sender, e) =>
+            {
+                eventSender = sender;
+                args = e;
+                ++eventCount;
+            };
 
-        //    var builder = new ContainerBuilder();
-        //    builder.Register<object>();
-        //    builder.Build(container);
+            container.RegisterType<object>();
 
-        //    Assert.AreEqual(1, eventCount);
-        //    Assert.IsNotNull(eventSender);
-        //    Assert.AreSame(container, eventSender);
-        //    Assert.IsNotNull(args);
-        //    Assert.AreSame(container, args.Container);
-        //    Assert.IsNotNull(args.ComponentRegistration.Descriptor.Services.FirstOrDefault(
-        //        s => s == new TypedService(typeof(object))));
-        //}
+            // This is necessary because actual registration is deferred.
+            Assert.IsTrue(container.IsRegistered<object>());
 
-        //[Test]
-        //public void ComponentRegisteredNotFiredOnNewContext()
-        //{
-        //    var eventCount = 0;
+            Assert.AreEqual(1, eventCount);
+            Assert.IsNotNull(eventSender);
+            Assert.AreSame(container.ComponentRegistry, eventSender);
+            Assert.IsNotNull(args);
+            Assert.AreSame(container.ComponentRegistry, args.ComponentRegistry);
+            Assert.IsTrue(args.ComponentRegistration.Services.Contains(new TypedService(typeof(object))));
+        }
 
-        //    var container = new Container();
-        //    container.ComponentRegistered += (sender, e) =>
-        //    {
-        //        ++eventCount;
-        //    };
+        [Test]
+        public void ComponentRegisteredNotFiredOnNewContext()
+        {
+            var eventCount = 0;
 
-        //    var builder = new ContainerBuilder();
-        //    builder.Register<object>().ContainerScoped();
-        //    builder.Build(container);
+            var container = new Container();
+            container.ComponentRegistry.Registered += (sender, e) =>
+            {
+                ++eventCount;
+            };
 
-        //    var inner = container.CreateInnerContainer();
-        //    inner.Resolve<object>();
+            container.RegisterType<object>().InstancePerLifetimeScope();
 
-        //    Assert.AreEqual(1, eventCount);
-        //}
+            var inner = container.BeginLifetimeScope();
+            inner.Resolve<object>();
 
-        //[Test]
-        //public void DefaultRegistrationIsForMostRecent()
-        //{
-        //    var builder = new ContainerBuilder();
-        //    builder.Register<object>().As<object>().Named("first");
-        //    builder.Register<object>().As<object>().Named("second");
-        //    var container = builder.Build();
+            Assert.AreEqual(1, eventCount);
+        }
 
-        //    IComponentRegistration defaultRegistration;
-        //    Assert.IsTrue(container.TryGetDefaultRegistrationFor(new TypedService(typeof(object)), out defaultRegistration));
-        //    Assert.IsTrue(defaultRegistration.Descriptor.Services.Contains(new NamedService("second")));
-        //}
+        [Test]
+        public void DefaultRegistrationIsForMostRecent()
+        {
+            var container = new Container();
+            container.RegisterType<object>().As<object>().Named("first");
+            container.RegisterType<object>().As<object>().Named("second");
 
-        //[Test]
-        //public void DefaultRegistrationFalseWhenAbsent()
-        //{
-        //    var container = new Container();
-        //    IComponentRegistration unused;
-        //    Assert.IsFalse(container.TryGetDefaultRegistrationFor(new TypedService(typeof(object)), out unused));
-        //}
+            IComponentRegistration defaultRegistration;
+            Assert.IsTrue(container.ComponentRegistry.TryGetRegistration(new TypedService(typeof(object)), out defaultRegistration));
+            Assert.IsTrue(defaultRegistration.Services.Contains(new NamedService("second")));
+        }
 
-        //[Test]
-        //public void DefaultRegistrationSuppliedDynamically()
-        //{
-        //    var container = new Container();
-        //    container.AddRegistrationSource(new ObjectRegistrationSource());
-        //    IComponentRegistration registration;
-        //    Assert.IsTrue(container.TryGetDefaultRegistrationFor(new TypedService(typeof(object)), out registration));
-        //}
+        [Test]
+        public void DefaultRegistrationFalseWhenAbsent()
+        {
+            var registry = new ComponentRegistry();
+            IComponentRegistration unused;
+            Assert.IsFalse(registry.TryGetRegistration(new TypedService(typeof(object)), out unused));
+        }
 
-        //[Test]
-        //public void IdSameInSubcontext()
-        //{
-        //    var builder = new ContainerBuilder();
-        //    builder.Register<object>().ContainerScoped();
+        [Test]
+        public void DefaultRegistrationSuppliedDynamically()
+        {
+            var registry = new ComponentRegistry();
+            registry.AddDynamicRegistrationSource(new ObjectRegistrationSource());
+            IComponentRegistration registration;
+            Assert.IsTrue(registry.TryGetRegistration(new TypedService(typeof(object)), out registration));
+        }
 
-        //    var container = builder.Build();
-        //    IComponentRegistration r1;
-        //    Assert.IsTrue(container.TryGetDefaultRegistrationFor(new TypedService(typeof(object)), out r1));
+        [Test]
+        public void ActivatingEventFiredInCorrectContext()
+        {
+            var container = new Container();
 
-        //    var inner = container.CreateInnerContainer();
-        //    IComponentRegistration r2;
-        //    Assert.IsTrue(inner.TryGetDefaultRegistrationFor(new TypedService(typeof(object)), out r2));
+            container.RegisterType<object>().InstancePerLifetimeScope();
 
-        //    Assert.AreNotSame(r1, r2);
-        //    Assert.AreEqual(r1.Descriptor.Id, r2.Descriptor.Id);
-        //}
+            object fromContext = null;
+            container.RegisterDelegate(c => "hello")
+                .SingleInstance()
+                .OnActivating(e => { fromContext = e.Context.Resolve<object>(); });
+
+            var lifetime = container.BeginLifetimeScope();
+            var hello = lifetime.Resolve<string>();
+
+            // The context in Activated should be the root one, as hello
+            // is a singleton - not the nested one.
+            Assert.AreSame(container.Resolve<object>(), fromContext);
+        }
+
+        [Test]
+        public void ActivatingEventFiredInCorrectContext2()
+        {
+            var container = new Container();
+
+            container.RegisterType<object>().InstancePerLifetimeScope();
+
+            object fromContext = null;
+            container.RegisterDelegate(c => "hello")
+                .UnsharedInstances()
+                .OnActivating(e => { fromContext = e.Context.Resolve<object>(); });
+
+            var lifetime = container.BeginLifetimeScope();
+            var hello = lifetime.Resolve<string>();
+
+            // The context in Activated should be the root one, as hello
+            // is a singleton - not the nested one.
+            Assert.AreSame(lifetime.Resolve<object>(), fromContext);
+        }
+
+        [Test]
+        public void ActivatedEventFiredInCorrectContext()
+        {
+            var container = new Container();
+
+            container.RegisterType<object>().InstancePerLifetimeScope();
+
+            object fromContext = null;
+            container.RegisterDelegate(c => "hello")
+                .SingleInstance()
+                .OnActivated(e => { fromContext = e.Context.Resolve<object>(); });
+
+            var lifetime = container.BeginLifetimeScope();
+            var hello = lifetime.Resolve<string>();
+
+            // The context in Activated should be the root one, as hello
+            // is a singleton - not the nested one.
+            Assert.AreSame(container.Resolve<object>(), fromContext);
+        }
+
+        [Test]
+        public void ActivatedEventFiredInCorrectContext2()
+        {
+            var container = new Container();
+
+            container.RegisterType<object>().InstancePerLifetimeScope();
+
+            object fromContext = null;
+            container.RegisterDelegate(c => "hello")
+                .UnsharedInstances()
+                .OnActivated(e => { fromContext = e.Context.Resolve<object>(); });
+
+            var lifetime = container.BeginLifetimeScope();
+            var hello = lifetime.Resolve<string>();
+
+            // The context in Activated should be the root one, as hello
+            // is a singleton - not the nested one.
+            Assert.AreSame(lifetime.Resolve<object>(), fromContext);
+        }
     }
 }

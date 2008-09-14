@@ -5,6 +5,9 @@ using Autofac.Lifetime;
 using Autofac.Activators;
 using Autofac.Services;
 using Autofac.Disposal;
+using Autofac.Events;
+using System;
+using Autofac.Injection;
 
 namespace Autofac.Syntax
 {
@@ -106,6 +109,53 @@ namespace Autofac.Syntax
         public IConcreteRegistrar<T> Named(string name)
         {
             return As(new NamedService(name));
+        }
+
+        public IConcreteRegistrar<T> OnActivating(Action<ActivatingEventArgs<T>> handler)
+        {
+            ActivatingHandlers.Add((s, e) =>
+            {
+                handler(new ActivatingEventArgs<T>(e.Context, e.Component, (T)e.Instance));
+            });
+
+            return this;
+        }
+
+        public IConcreteRegistrar<T> OnActivated(Action<ActivatedEventArgs<T>> handler)
+        {
+            ActivatedHandlers.Add((s, e) =>
+            {
+                handler(new ActivatedEventArgs<T>(e.Context, e.Component, (T)e.Instance));
+            });
+
+            return this;
+        }
+
+        public IConcreteRegistrar<T> PropertiesAutowired()
+        {
+            var injector = new AutowiringPropertyInjector();
+            ActivatingHandlers.Add((s, e) =>
+            {
+                injector.InjectProperties(e.Context, e.Instance, true);
+            });
+            return this;
+        }
+
+        public IConcreteRegistrar<T> PropertiesAutowired(bool allowCircularDependencies)
+        {
+            if (allowCircularDependencies)
+            {
+                var injector = new AutowiringPropertyInjector();
+                ActivatedHandlers.Add((s, e) =>
+                {
+                    injector.InjectProperties(e.Context, e.Instance, true);
+                });
+                return this;
+            }
+            else
+            {
+                return PropertiesAutowired();
+            }
         }
     }
 }

@@ -35,14 +35,14 @@ namespace Autofac.Activators
             return selectedBinding.Instantiate();
         }
 
-        private ConstructorBinding SelectConstructorBinding(
-            IEnumerable<ConstructorBinding> constructorBindings)
+        private ConstructorParameterBinding SelectConstructorBinding(
+            IEnumerable<ConstructorParameterBinding> constructorBindings)
         {
             Enforce.ArgumentNotNull(constructorBindings, "constructorBindings");
             return constructorBindings.First();
         }
 
-        private IEnumerable<ConstructorBinding> GetConstructorBindings(
+        private IEnumerable<ConstructorParameterBinding> GetConstructorBindings(
             IComponentContext context,
             IEnumerable<Parameter> parameters,
             IEnumerable<ConstructorInfo> constructorInfo)
@@ -56,7 +56,7 @@ namespace Autofac.Activators
                 parameters.Concat(new Parameter[] { new AutowiringParameter() });
 
             return constructorInfo.Select(
-                ci => new ConstructorBinding(ci, prioritisedParameters, context));
+                ci => new ConstructorParameterBinding(ci, prioritisedParameters, context));
         }
     }
 }

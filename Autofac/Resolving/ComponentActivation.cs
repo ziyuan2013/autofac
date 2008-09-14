@@ -7,22 +7,24 @@ using Autofac.Disposal;
 
 namespace Autofac.Resolving
 {
-    class ComponentActivation
+    // Is a component context that pins resolution to a point in the context hierarchy
+    class ComponentActivation : IComponentContext
     {
         IComponentRegistration _registration;
-        IComponentContext _context;
-        ISharingLifetimeScope _mostNestedVisibleScope;
+        IResolveOperation _context;
         ISharingLifetimeScope _activationScope;
         object _newInstance;
+        bool _executed;
 
         public ComponentActivation(
             IComponentRegistration registration,
-            IComponentContext context,
+            IResolveOperation context,
             ISharingLifetimeScope mostNestedVisibleScope)
         {
             _registration = Enforce.ArgumentNotNull(registration, "registration");
             _context = Enforce.ArgumentNotNull(context, "context");
-            _mostNestedVisibleScope = Enforce.ArgumentNotNull(mostNestedVisibleScope, "mostNestedVisibleScope");
+            Enforce.ArgumentNotNull(mostNestedVisibleScope, "mostNestedVisibleScope");
+            _activationScope = _registration.Lifetime.FindScope(mostNestedVisibleScope);
         }
 
         public IComponentRegistration Registration { get { return _registration; } }
@@ -30,20 +32,22 @@ namespace Autofac.Resolving
         public object Execute(IEnumerable<Parameter> parameters)
         {
             Enforce.ArgumentNotNull(parameters, "parameters");
-            if (_activationScope != null)
+            if (_executed)
                 throw new InvalidOperationException("Execute already called.");
-
-            _activationScope = _registration.Lifetime.FindScope(_mostNestedVisibleScope);
+            else
+                _executed = true;
 
             object sharedInstance;
             if (IsSharedInstanceAvailable(out sharedInstance))
                 return sharedInstance;
 
-            _newInstance = _registration.Activator.ActivateInstance(_context, parameters);
+            _newInstance = _registration.Activator.ActivateInstance(this, parameters);
 
             AssignNewInstanceOwnership();
 
             ShareNewInstance();
+
+            _registration.RaiseActivating(this, _newInstance);
 
             return _newInstance;
         }
@@ -81,19 +85,18 @@ namespace Autofac.Resolving
         {
             if (_newInstance != null)
             {
-                _registration.Activator.CompleteActivation(_newInstance, _activationScope);
+                _registration.RaiseActivated(this, _newInstance);
             }
         }
 
-        public ISharingLifetimeScope ActivationScope
+        public IComponentRegistry ComponentRegistry
         {
-            get
-            {
-                if (_activationScope == null)
-                    throw new InvalidOperationException("not executed yet");
+            get { return _activationScope.ComponentRegistry; }
+        }
 
-                return _activationScope;
-            }
+        public object Resolve(IComponentRegistration registration, IEnumerable<Parameter> parameters)
+        {
+            return _context.Resolve(_activationScope, registration, parameters);
         }
     }
 }

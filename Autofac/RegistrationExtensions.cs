@@ -4,6 +4,12 @@ using Autofac.Syntax;
 using System;
 using System.Collections.Generic;
 using Autofac.Registry;
+using Autofac.Services;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Globalization;
+using Autofac.GeneratedFactories;
 
 namespace Autofac
 {
@@ -74,6 +80,38 @@ namespace Autofac
             Enforce.ArgumentNotNull(creationDelegate, "creationDelegate");
 
             return CreateConcreteRegistration<T>(container, new DelegateActivator(typeof(T), (c, p) => creationDelegate(c, p)));
+        }
+
+        /// <summary>
+        /// Registers the factory delegate.
+        /// </summary>
+        /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
+        /// <param name="service">The service that the delegate will return instances of.</param>
+        /// <returns>A registrar allowing configuration to continue.</returns>
+        public static IConcreteRegistrar<TDelegate> RegisterGeneratedFactory<TDelegate>(this IContainer container, Service service)
+            where TDelegate : class
+        {
+            Enforce.ArgumentNotNull(container, "container");
+            Enforce.ArgumentNotNull(service, "service");
+
+            var factory = new FactoryGenerator<TDelegate>(service);
+
+            return container.RegisterDelegate<TDelegate>((c, p) => factory.GenerateFactory(c, p))
+                .InstancePerLifetimeScope();
+        }
+        /// <summary>
+        /// Registers the factory delegate.
+        /// </summary>
+        /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
+        /// <returns>A registrar allowing configuration to continue.</returns>
+        public static IConcreteRegistrar<TDelegate> RegisterGeneratedFactory<TDelegate>(this IContainer container)
+            where TDelegate : class
+        {
+            Enforce.ArgumentNotNull(container, "container");
+            Enforce.ArgumentTypeIsDelegate(typeof(TDelegate));
+
+            var returnType = typeof(TDelegate).GetMethod("Invoke").ReturnType;
+            return container.RegisterGeneratedFactory<TDelegate>(new TypedService(returnType));
         }
     }
 }

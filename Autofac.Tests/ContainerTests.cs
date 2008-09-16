@@ -849,5 +849,13 @@ namespace Autofac.Tests
             // is a singleton - not the nested one.
             Assert.AreSame(lifetime.Resolve<object>(), fromContext);
         }
+
+        [Test]
+        public void CanResolveIComponentContextFromContainer()
+        {
+            var container = new Container();
+            var cc = container.Resolve<IComponentContext>();
+            Assert.IsNotNull(cc);
+        }
     }
 }

@@ -27,6 +27,7 @@ using System;
 using System.Linq;
 using System.Globalization;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Autofac
 {
@@ -110,6 +111,19 @@ namespace Autofac
                     EnforceResources.CannotBeEmpty, description));
 
             return value;
+        }
+
+        public static void ArgumentTypeIsDelegate(Type delegateType)
+        {
+            Enforce.ArgumentNotNull(delegateType, "delegateType");
+
+            MethodInfo invoke = delegateType.GetMethod("Invoke");
+            if (invoke == null)
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
+                    "Type {0} is not a delegate type.", delegateType));
+            else if (invoke.ReturnType == typeof(void))
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
+                    "Type {0} returns void.", delegateType));
         }
     }
 }

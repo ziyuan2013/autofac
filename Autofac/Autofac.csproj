@@ -53,6 +53,7 @@
     <Compile Include="Activators\ReflectionActivator.cs" />
     <Compile Include="Events\ActivatedEventArgs.cs" />
     <Compile Include="Events\ActivatingEventArgs.cs" />
+    <Compile Include="GeneratedFactories\FactoryGenerator.cs" />
     <Compile Include="Injection\AutowiringParameter.cs" />
     <Compile Include="ComponentNotRegisteredException.cs" />
     <Compile Include="ComponentNotRegisteredExceptionResources.Designer.cs">

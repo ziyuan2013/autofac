@@ -32,7 +32,7 @@ namespace Autofac
 
             _componentRegistry.Register(new ComponentRegistration(
                 Guid.NewGuid(),
-                new DelegateActivator(typeof(LifetimeScope), (c, p) => c.Resolve<ILifetimeScope>()),
+                new DelegateActivator(typeof(LifetimeScope), (c, p) => c.Resolve<IndirectReference<ILifetimeScope>>().Value),
                 new CurrentScopeLifetime(),
                 InstanceSharing.Shared,
                 InstanceOwnership.ExternallyOwned,

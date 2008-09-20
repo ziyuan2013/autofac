@@ -142,6 +142,7 @@
     <Compile Include="RegistrationSources\DynamicRegistrationSource.cs" />
     <Compile Include="Services\TypedService.cs" />
     <Compile Include="Services\UniqueService.cs" />
+    <Compile Include="TypedParameter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ComponentNotRegisteredExceptionResources.resx">

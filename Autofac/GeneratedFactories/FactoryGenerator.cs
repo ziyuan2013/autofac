@@ -33,17 +33,13 @@ namespace Autofac.GeneratedFactories
                 .Select(pi => Expression.Parameter(pi.ParameterType, pi.Name))
                 .ToList();
 
+            Expression[] resolveParameterArray = MapParametersForDelegateType(delegateType, creatorParams);
+
             // service, [new Parameter(name, (object)dps)]*
             var resolveParams = new Expression[] {
                 activatorContextParam,
                 Expression.Constant(service),
-                Expression.NewArrayInit(typeof(Parameter),
-                    creatorParams
-                        .Select(p => Expression.New(
-                            typeof(NamedParameter).GetConstructor(new[] { typeof(string), typeof(object) }),
-                            Expression.Constant(p.Name), Expression.Convert(p, typeof(object))))
-                        .OfType<Expression>()
-                        .ToArray())
+                Expression.NewArrayInit(typeof(Parameter), resolveParameterArray)
             };
 
             // c.Resolve(...)
@@ -61,6 +57,28 @@ namespace Autofac.GeneratedFactories
             var activator = Expression.Lambda<Func<IComponentContext, IEnumerable<Parameter>, TDelegate>>(creator, activatorParams);
 
             _generator = activator.Compile();
+        }
+
+        Expression[] MapParametersForDelegateType(Type delegateType, List<ParameterExpression> creatorParams)
+        {
+            if (delegateType.Name.StartsWith("Func`"))
+            {
+                return creatorParams
+                        .Select(p => Expression.New(
+                            typeof(TypedParameter).GetConstructor(new[] { typeof(Type), typeof(object) }),
+                            Expression.Constant(p.Type), Expression.Convert(p, typeof(object))))
+                        .OfType<Expression>()
+                        .ToArray();
+            }
+            else
+            {
+                return creatorParams
+                        .Select(p => Expression.New(
+                            typeof(NamedParameter).GetConstructor(new[] { typeof(string), typeof(object) }),
+                            Expression.Constant(p.Name), Expression.Convert(p, typeof(object))))
+                        .OfType<Expression>()
+                        .ToArray();
+            }
         }
 
         public TDelegate GenerateFactory(IComponentContext context, IEnumerable<Parameter> parameters)

@@ -23,6 +23,13 @@ namespace Autofac
             return ConstantValue<PositionalParameter, T>(parameters, c => c.Position == position);
         }
 
+        public static T TypedAs<T>(this IEnumerable<Parameter> parameters)
+        {
+            Enforce.ArgumentNotNull(parameters, "parameters");
+
+            return ConstantValue<TypedParameter, T>(parameters, c => c.Type == typeof(T));
+        }
+
         static TValue ConstantValue<TParameter, TValue>(IEnumerable<Parameter> parameters, Func<TParameter, bool> predicate)
             where TParameter : ConstantParameter
         {

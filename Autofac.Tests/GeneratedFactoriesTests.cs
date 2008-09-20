@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using NUnit.Framework;
 using Autofac.Services;
+using System;
 
 namespace Autofac.Tests
 {
@@ -98,6 +99,28 @@ namespace Autofac.Tests
                 new TypedService(typeof(Shareholding)));
 
             var shareholdingFactory = container.Resolve<Shareholding.Factory>();
+
+            var shareholding = shareholdingFactory.Invoke("ABC", 1234);
+
+            Assert.AreEqual("ABC", shareholding.Symbol);
+            Assert.AreEqual(1234, shareholding.Holding);
+            Assert.AreEqual(1234m * 2, shareholding.Quote());
+        }
+
+        [Test]
+        public void ShareholdingExampleMatchingFuncParametersByType()
+        {
+            var container = new Container();
+
+            container.RegisterType<QuoteService>();
+
+            container.RegisterType<Shareholding>()
+              .UnsharedInstances();
+
+            container.RegisterGeneratedFactory<Func<string,uint,Shareholding>>(
+                new TypedService(typeof(Shareholding)));
+
+            var shareholdingFactory = container.Resolve<Func<string, uint, Shareholding>>();
 
             var shareholding = shareholdingFactory.Invoke("ABC", 1234);
 

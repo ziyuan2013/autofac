@@ -501,7 +501,7 @@ namespace Autofac.Tests
         }
 
         [Test]
-        public void ResolveByName()
+        public void CanResolveByName()
         {
             string name = "name";
 
@@ -663,7 +663,7 @@ namespace Autofac.Tests
         }
 
         [Test]
-        public void ResolveByNameWithServiceType()
+        public void CanResolveByNameWithGenericTypeArgument()
         {
             var myName = "Something";
             var container = new Container();

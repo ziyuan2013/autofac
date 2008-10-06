@@ -88,7 +88,7 @@ namespace Autofac
         /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
         /// <param name="service">The service that the delegate will return instances of.</param>
         /// <returns>A registrar allowing configuration to continue.</returns>
-        public static IConcreteRegistrar<TDelegate> RegisterGeneratedFactory<TDelegate>(this IContainer container, Service service)
+        public static IGeneratedFactoryRegistrar<TDelegate> RegisterGeneratedFactory<TDelegate>(this IContainer container, Service service)
             where TDelegate : class
         {
             Enforce.ArgumentNotNull(container, "container");
@@ -96,22 +96,26 @@ namespace Autofac
 
             var factory = new FactoryGenerator<TDelegate>(service);
 
-            return container.RegisterDelegate<TDelegate>((c, p) => factory.GenerateFactory(c, p))
+            var inner = container.RegisterDelegate<TDelegate>((c, p) => factory.GenerateFactory(c, p))
                 .InstancePerLifetimeScope();
+
+            return new GeneratedFactoryRegistrar<TDelegate>(factory, inner);
         }
         /// <summary>
         /// Registers the factory delegate.
         /// </summary>
         /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
         /// <returns>A registrar allowing configuration to continue.</returns>
-        public static IConcreteRegistrar<TDelegate> RegisterGeneratedFactory<TDelegate>(this IContainer container)
+        public static IGeneratedFactoryRegistrar<TDelegate> RegisterGeneratedFactory<TDelegate>(this IContainer container)
             where TDelegate : class
         {
             Enforce.ArgumentNotNull(container, "container");
-            Enforce.ArgumentTypeIsDelegate(typeof(TDelegate));
+            Enforce.ArgumentTypeIsFunction(typeof(TDelegate));
 
             var returnType = typeof(TDelegate).GetMethod("Invoke").ReturnType;
             return container.RegisterGeneratedFactory<TDelegate>(new TypedService(returnType));
         }
+
+        //public static IReflectiveRegistrar RegisterGenericType(
     }
 }

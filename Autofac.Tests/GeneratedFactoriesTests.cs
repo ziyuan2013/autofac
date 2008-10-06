@@ -153,5 +153,42 @@ namespace Autofac.Tests
             var innerFac = inner.Resolve<StringHolder.Factory>();
             Assert.AreEqual("Inner", innerFac().S);
         }
+
+        [Test]
+        public void CanSetParmeterMappingToPositional()
+        {
+            var container = new Container();
+
+            int i0 = 32, i0Actual = 0, i1 = 67, i1Actual = 0;
+
+            container.RegisterDelegate<object>((c, p) =>
+            {
+                i0Actual = p.Positional<int>(0);
+                i1Actual = p.Positional<int>(1);
+                return new object();
+            });
+
+            container.RegisterGeneratedFactory<Func<int, int, object>>()
+                .PositionalParameterMapping();
+
+            var generated = container.Resolve<Func<int, int, object>>();
+
+            generated(i0, i1);
+
+            Assert.AreEqual(i0, i0Actual);
+            Assert.AreEqual(i1, i1Actual);
+        }
+
+        [Test]
+        public void CanNameGeneratedFactories()
+        {
+            var container = new Container();
+
+            container.RegisterGeneratedFactory<Func<object>>().Named("object-factory");
+
+            var of = container.Resolve<Func<object>>("object-factory");
+
+            Assert.IsNotNull(of);
+        }
     }
 }

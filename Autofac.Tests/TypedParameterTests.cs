@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Autofac.Tests
 {
     [TestFixture]
-    public class TypedParameterFixture
+    public class TypedParameterTests
     {
         class A
         {

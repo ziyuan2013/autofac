@@ -1,6 +1,6 @@
-﻿
-using System.Reflection;
+﻿using System.Reflection;
 using System;
+
 namespace Autofac
 {
     public abstract class Parameter

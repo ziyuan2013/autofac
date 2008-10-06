@@ -50,11 +50,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BugFixture.cs" />
+    <Compile Include="ContainerTests2.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="DisposeTracker.cs" />
     <Compile Include="GeneratedFactoriesTests.cs" />
+    <Compile Include="OpenGenericsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypedParameterFixture.cs" />
+    <Compile Include="TypedParameterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Autofac\Autofac.csproj">

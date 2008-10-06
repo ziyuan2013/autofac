@@ -857,5 +857,22 @@ namespace Autofac.Tests
             var cc = container.Resolve<IComponentContext>();
             Assert.IsNotNull(cc);
         }
+
+        [Test]
+        public void UnsharedInstancesDisposedAlongWithLifetimeScope()
+        {
+            var container = new Container();
+            container.RegisterType<DisposeTracker>().UnsharedInstances();
+
+            var lifetime = container.BeginLifetimeScope();
+
+            var component = lifetime.Resolve<DisposeTracker>();
+
+            Assert.IsFalse(component.IsDisposed);
+
+            lifetime.Dispose();
+
+            Assert.IsTrue(component.IsDisposed);
+        }
     }
 }

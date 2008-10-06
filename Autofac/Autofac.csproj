@@ -127,7 +127,9 @@
     <Compile Include="Resolving\CircularDependencyDetector.cs" />
     <Compile Include="Syntax\ConcreteRegistrar.cs" />
     <Compile Include="RegistrationSources\ConcreteRegistrationData.cs" />
+    <Compile Include="Syntax\GeneratedFactoryRegistrar.cs" />
     <Compile Include="Syntax\IConcreteRegistrar.cs" />
+    <Compile Include="Syntax\IGeneratedFactoryRegistrar.cs" />
     <Compile Include="Syntax\IRegistrar.cs" />
     <Compile Include="Syntax\Registrar.cs" />
     <Compile Include="RegistrationSources\RegistrationData.cs" />

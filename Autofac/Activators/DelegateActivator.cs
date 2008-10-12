@@ -7,7 +7,7 @@ namespace Autofac.Activators
 {
     public class DelegateActivator : InstanceActivator, IInstanceActivator
     {
-        Func<IComponentContext, IEnumerable<Parameter>, object> _activationFunction;
+        readonly Func<IComponentContext, IEnumerable<Parameter>, object> _activationFunction;
         
         public DelegateActivator(Type bestGuessImplementationType, Func<IComponentContext, IEnumerable<Parameter>, object> activationFunction)
             : base(bestGuessImplementationType)

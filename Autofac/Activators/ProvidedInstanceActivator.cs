@@ -5,7 +5,7 @@ namespace Autofac.Activators
 {
     public class ProvidedInstanceActivator : InstanceActivator, IInstanceActivator
     {
-        object _instance;
+        readonly object _instance;
         bool _activated;
 
         public ProvidedInstanceActivator(object instance)

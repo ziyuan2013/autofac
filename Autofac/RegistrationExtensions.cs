@@ -40,7 +40,7 @@ namespace Autofac
             return CreateConcreteRegistration<T>(container, new ProvidedInstanceActivator(instance));
         }
 
-        static IConcreteRegistrar<T> CreateConcreteRegistration<T>(IContainer container, IInstanceActivator activator)
+        static ConcreteRegistrar<T> CreateConcreteRegistration<T>(IContainer container, IInstanceActivator activator)
             where T : class
         {
             var registrar = new ConcreteRegistrar<T>(activator);
@@ -48,20 +48,27 @@ namespace Autofac
             return registrar;
         }
 
-        public static IConcreteRegistrar<T> RegisterType<T>(this IContainer container)
+        public static IConcreteReflectiveRegistrar<T> RegisterType<T>(this IContainer container)
             where T : class
         {
             Enforce.ArgumentNotNull(container, "container");
 
-            return CreateConcreteRegistration<T>(container, new ReflectionActivator(typeof(T)));
+            return CreateConcreteReflectiveRegistration<T>(container, new ReflectionActivator(typeof(T)));
         }
 
-        public static IConcreteRegistrar<object> RegisterType(this IContainer container, Type implementationType)
+        public static IConcreteReflectiveRegistrar<object> RegisterType(this IContainer container, Type implementationType)
         {
             Enforce.ArgumentNotNull(container, "container");
             Enforce.ArgumentNotNull(implementationType, "implementationType");
 
-            return CreateConcreteRegistration<object>(container, new ReflectionActivator(implementationType));
+            return CreateConcreteReflectiveRegistration<object>(container, new ReflectionActivator(implementationType));
+        }
+
+        static IConcreteReflectiveRegistrar<T> CreateConcreteReflectiveRegistration<T>(IContainer container, ReflectionActivator reflectionActivator)
+            where T : class
+        {
+            var inner = CreateConcreteRegistration<T>(container, reflectionActivator);
+            return new ConcreteReflectiveRegistrar<T>(inner, reflectionActivator);
         }
 
         public static IConcreteRegistrar<T> RegisterDelegate<T>(this IContainer container, Func<IComponentContext, T> creationDelegate)
@@ -116,6 +123,10 @@ namespace Autofac
             return container.RegisterGeneratedFactory<TDelegate>(new TypedService(returnType));
         }
 
-        //public static IReflectiveRegistrar RegisterGenericType(
+
+        //public static IGenericReflectiveRegistrar RegisterGenericType(this IContainer container, Type openGenericType)
+        //{
+        //    return null;
+        //}
     }
 }

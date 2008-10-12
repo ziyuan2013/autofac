@@ -4,7 +4,7 @@ using Autofac;
 using Autofac.Registry;
 using Autofac.Services;
 
-namespace Autofacontainer.Tests.container
+namespace Autofac.Tests
 {
     [TestFixture]
     public class OpenGenericTests

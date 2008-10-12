@@ -9,7 +9,7 @@ namespace Autofac.Activators
 {
     public abstract class InstanceActivator
     {
-        Type _bestGuessImplementationType;
+        readonly Type _bestGuessImplementationType;
 
         protected InstanceActivator(Type bestGuessImplementationType)
         {

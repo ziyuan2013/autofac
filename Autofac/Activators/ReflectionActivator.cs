@@ -8,12 +8,37 @@ namespace Autofac.Activators
 {
     public class ReflectionActivator : InstanceActivator, IInstanceActivator
     {
-        Type _implementationType;
+        readonly Type _implementationType;
+        readonly IConstructorSelector _constructorSelector;
+        readonly IConstructorFinder _constructorFinder;
 
         public ReflectionActivator(Type implementationType)
+            : this(
+                implementationType,
+                new BindingFlagsConstructorFinder(BindingFlags.Public),
+                new MostParametersConstructorSelector())
+        {
+        }
+
+        public ReflectionActivator(
+            Type implementationType,
+            IConstructorFinder constructorFinder,
+            IConstructorSelector constructorSelector)
             : base(Enforce.ArgumentNotNull(implementationType, "implementationType"))
         {
             _implementationType = implementationType;
+            _constructorFinder = Enforce.ArgumentNotNull(constructorFinder, "constructorFinder");
+            _constructorSelector = Enforce.ArgumentNotNull(constructorSelector, "constructorSelector");
+        }
+
+        public IConstructorFinder ConstructorFinder
+        {
+            get { return _constructorFinder; }
+        }
+
+        public IConstructorSelector ConstructorSelector
+        {
+            get { return _constructorSelector; }
         }
 
         public object ActivateInstance(IComponentContext context, IEnumerable<Parameter> parameters)
@@ -21,25 +46,24 @@ namespace Autofac.Activators
             Enforce.ArgumentNotNull(context, "context");
             Enforce.ArgumentNotNull(parameters, "parameters");
 
+            var availableConstructors = _constructorFinder.FindConstructors(_implementationType);
+
+            if (!availableConstructors.Any())
+                throw new DependencyResolutionException("TODO- No constructors are available.");
+
             var constructorBindings = GetConstructorBindings(
                 context,
                 parameters,
-                _implementationType.FindMembers(
-                    MemberTypes.Constructor,
-                    BindingFlags.Instance | BindingFlags.Public,
-                    null,
-                    null).Cast<ConstructorInfo>());
+                availableConstructors);
 
-            var selectedBinding = SelectConstructorBinding(constructorBindings);
+            var validBindings = constructorBindings.Where(cb => cb.CanInstantiate);
+
+            if (!validBindings.Any())
+                throw new DependencyResolutionException("TODO- get reasons from bindings.");
+
+            var selectedBinding = _constructorSelector.SelectConstructorBinding(validBindings);
 
             return selectedBinding.Instantiate();
-        }
-
-        private ConstructorParameterBinding SelectConstructorBinding(
-            IEnumerable<ConstructorParameterBinding> constructorBindings)
-        {
-            Enforce.ArgumentNotNull(constructorBindings, "constructorBindings");
-            return constructorBindings.First();
         }
 
         private IEnumerable<ConstructorParameterBinding> GetConstructorBindings(

@@ -48,8 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activators\DelegateActivator.cs" />
+    <Compile Include="Activators\IConstructorFinder.cs" />
+    <Compile Include="Activators\IConstructorSelector.cs" />
     <Compile Include="Activators\InstanceActivator.cs" />
+    <Compile Include="Activators\MatchingSignatureConstructorSelector.cs" />
+    <Compile Include="Activators\MostParametersConstructorSelector.cs" />
     <Compile Include="Activators\ProvidedInstanceActivator.cs" />
+    <Compile Include="Activators\BindingFlagsConstructorFinder.cs" />
     <Compile Include="Activators\ReflectionActivator.cs" />
     <Compile Include="Events\ActivatedEventArgs.cs" />
     <Compile Include="Events\ActivatingEventArgs.cs" />
@@ -125,11 +130,13 @@
       <DependentUpon>ResolveOperationResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Resolving\CircularDependencyDetector.cs" />
+    <Compile Include="Syntax\ConcreteReflectiveRegistrar.cs" />
     <Compile Include="Syntax\ConcreteRegistrar.cs" />
     <Compile Include="RegistrationSources\ConcreteRegistrationData.cs" />
     <Compile Include="Syntax\GeneratedFactoryRegistrar.cs" />
     <Compile Include="Syntax\IConcreteRegistrar.cs" />
     <Compile Include="Syntax\IGeneratedFactoryRegistrar.cs" />
+    <Compile Include="Syntax\IConcreteReflectiveRegistrar.cs" />
     <Compile Include="Syntax\IRegistrar.cs" />
     <Compile Include="Syntax\Registrar.cs" />
     <Compile Include="RegistrationSources\RegistrationData.cs" />

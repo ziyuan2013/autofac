@@ -6,14 +6,20 @@ namespace Autofac.RegistrationSources
 {
     public class ConcreteRegistrationData : RegistrationData, IRegistrationData, IConcreteRegistrationData
     {
+        IInstanceActivator _activator;
+
         public ConcreteRegistrationData(IInstanceActivator activator)
         {
             Id = Guid.NewGuid();
             Activator = Enforce.ArgumentNotNull(activator, "activator");
         }
 
-        public virtual Guid Id { get; protected set; }
+        public virtual Guid Id { get; set; }
 
-        public virtual IInstanceActivator Activator { get; protected set; }
+        public virtual IInstanceActivator Activator
+        {
+            get { return _activator; }
+            set { _activator = Enforce.ArgumentNotNull(value, "value"); }
+        }
     }
 }

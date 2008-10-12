@@ -37,9 +37,9 @@ namespace Autofac.Disposal
         /// <summary>
         /// Contents all implement IDisposable.
         /// </summary>
-        Stack<WeakReference> _items = new Stack<WeakReference>();
+        readonly Stack<WeakReference> _items = new Stack<WeakReference>();
 
-        object _synchRoot = new object();
+        readonly object _synchRoot = new object();
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources

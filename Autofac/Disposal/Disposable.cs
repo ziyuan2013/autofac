@@ -8,7 +8,7 @@ namespace Autofac.Disposal
     public class Disposable : IDisposable
     {
         bool _isDisposed;
-        object _synchRoot = new object();
+        readonly object _synchRoot = new object();
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

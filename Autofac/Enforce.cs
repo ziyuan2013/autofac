@@ -28,6 +28,7 @@ using System.Linq;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Collections;
 
 namespace Autofac
 {
@@ -66,12 +67,12 @@ namespace Autofac
         /// <param name="value">The value.</param>
         /// <param name="name">The name.</param>
         /// <returns><paramref name="value"/></returns>
-        public static IEnumerable<T> ArgumentElementNotNull<T>(IEnumerable<T> value, string name)
-            where T : class
+        public static T ArgumentElementNotNull<T>(T value, string name)
+            where T : class, IEnumerable
         {
             Enforce.ArgumentNotNull(value, name);
 
-            if (value.Contains(null))
+            if (value.Cast<object>().Contains(null))
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, EnforceResources.ElementCannotBeNull, name));
 
             return value;

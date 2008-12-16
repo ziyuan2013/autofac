@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Globalization;
 using Autofac.GeneratedFactories;
+using Autofac.OpenGenerics;
 
 namespace Autofac
 {
@@ -123,10 +124,12 @@ namespace Autofac
             return container.RegisterGeneratedFactory<TDelegate>(new TypedService(returnType));
         }
 
-
-        //public static IGenericReflectiveRegistrar RegisterGenericType(this IContainer container, Type openGenericType)
-        //{
-        //    return null;
-        //}
+        public static IDynamicReflectiveRegistrar RegisterGenericType(this IContainer container, Type openGenericType)
+        {
+            var activatorGenerator = new OpenGenericActivatorGenerator(openGenericType);
+            var registrar = new DynamicRegistrar();
+            container.ComponentRegistry.AddDynamicRegistrationSource(new DynamicRegistrationSource(registrar, activatorGenerator));
+            return new DynamicReflectiveRegistrar(registrar, activatorGenerator);
+        }
     }
 }

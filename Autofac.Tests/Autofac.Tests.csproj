@@ -50,11 +50,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BugFixture.cs" />
+    <Compile Include="ComponentRegistryTests.cs" />
     <Compile Include="ContainerTests2.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="DisposeTracker.cs" />
     <Compile Include="GeneratedFactoriesTests.cs" />
+    <Compile Include="LifetimeTests.cs" />
     <Compile Include="OpenGenericsTests.cs" />
+    <Compile Include="OwnedInstancesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectiveRegistrationTests.cs" />
     <Compile Include="TypedParameterTests.cs" />

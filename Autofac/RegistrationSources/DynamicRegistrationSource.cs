@@ -35,13 +35,15 @@ namespace Autofac.RegistrationSources
     /// This class provides a common base for registration handlers that provide
     /// reflection-based registrations.
     /// </summary>
-    public abstract class DynamicRegistrationSource : IDynamicRegistrationSource
+    public class DynamicRegistrationSource : IDynamicRegistrationSource
     {
         IRegistrationData _registrationData;
+        IDynamicActivatorGenerator _activatorGenerator;
 
-        public DynamicRegistrationSource(IRegistrationData registrationData)
+        public DynamicRegistrationSource(IRegistrationData registrationData, IDynamicActivatorGenerator activatorGenerator)
         {
             _registrationData = Enforce.ArgumentNotNull(registrationData, "registrationData");
+            _activatorGenerator = Enforce.ArgumentNotNull(activatorGenerator, "activatorGenerator");
         }
         
         /// <summary>
@@ -51,19 +53,19 @@ namespace Autofac.RegistrationSources
         /// <param name="service">The service that was requested.</param>
         /// <param name="registration">A registration providing the service.</param>
         /// <returns>True if the registration could be created.</returns>
-        public virtual bool TryGetRegistration(Service service, out IComponentRegistration registration)
+        public virtual bool TryGetRegistration(Service service, Func<Service, bool> registeredServicesTest, out IComponentRegistration registration)
         {
             Enforce.ArgumentNotNull(service, "service");
             registration = null;
 
-            Type concrete;
+            IInstanceActivator activator;
             IEnumerable<Service> services;
-            if (!TryGetImplementation(service, _registrationData.Services, out concrete, out services))
+            if (!_activatorGenerator.TryGenerateActivator(service, _registrationData.Services, out activator, out services))
                 return false;
 
             registration = new ComponentRegistration(
                 Guid.NewGuid(),
-                new ReflectionActivator(concrete),
+                activator,
                 _registrationData.Lifetime,
                 _registrationData.Sharing,
                 _registrationData.Ownership,
@@ -72,15 +74,5 @@ namespace Autofac.RegistrationSources
 
             return true;
         }
-
-        /// <summary>
-        /// Determine if the service represents a type that can be registered, and if so,
-        /// retrieve that type as well as the services that the registration should expose.
-        /// </summary>
-        /// <param name="service">The service.</param>
-        /// <param name="implementor">The implementation type.</param>
-        /// <param name="services">The services.</param>
-        /// <returns>True if a registration can be made.</returns>
-        protected abstract bool TryGetImplementation(Service service, IEnumerable<Service> configuredServices, out Type implementor, out IEnumerable<Service> services);
     }
 }

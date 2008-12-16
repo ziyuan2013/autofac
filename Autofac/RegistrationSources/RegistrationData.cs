@@ -12,8 +12,8 @@ namespace Autofac.RegistrationSources
         public RegistrationData()
         {
             Ownership = InstanceOwnership.OwnedByLifetimeScope;
-            Lifetime = new RootScopeLifetime();
-            Sharing = InstanceSharing.Shared;
+            Lifetime = new CurrentScopeLifetime();
+            Sharing = InstanceSharing.None;
             Services = new HashSet<Service>();
             ExtendedProperties = new Dictionary<string, object>();
             ActivatingHandlers = new List<EventHandler<ActivatingEventArgs<object>>>();

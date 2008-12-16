@@ -15,6 +15,15 @@ namespace Autofac.Registry
 
         IEnumerable<IComponentRegistration> Registrations { get; }
 
+        /// <summary>
+        /// Selects from the available registrations after ensuring that any
+        /// dynamic registration sources that may provide <paramref name="service"/>
+        /// have been invoked.
+        /// </summary>
+        /// <param name="service">The service for which registrations are sought.</param>
+        /// <returns>Registrations supporting <paramref name="service"/>.</returns>
+        IEnumerable<IComponentRegistration> RegistrationsFor(Service service);
+
         event EventHandler<ComponentRegisteredEventArgs> Registered;
 
         void AddDeferredRegistrationSource(IDeferredRegistrationSource source);

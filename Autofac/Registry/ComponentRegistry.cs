@@ -43,7 +43,7 @@ namespace Autofac.Registry
 
             foreach (var rs in _dynamicRegistrationSources)
             {
-                if (rs.TryGetRegistration(service, out registration))
+                if (rs.TryGetRegistration(service, s => IsRegistered(s), out registration))
                 {
                     Register(registration);
                     return true;
@@ -54,7 +54,7 @@ namespace Autofac.Registry
             return false;
         }
 
-        private void DeferredInitialise()
+        void DeferredInitialise()
         {
             var sources = _registrationSources;
             _registrationSources = new List<IDeferredRegistrationSource>();
@@ -86,6 +86,13 @@ namespace Autofac.Registry
                 DeferredInitialise();
                 return _registrations.ToList();
             }
+        }
+
+        public IEnumerable<IComponentRegistration> RegistrationsFor(Service service)
+        {
+            Enforce.ArgumentNotNull(service, "service");
+            IsRegistered(service);
+            return Registrations.Where(r => r.Services.Contains(service));
         }
 
         public void AddDeferredRegistrationSource(IDeferredRegistrationSource source)

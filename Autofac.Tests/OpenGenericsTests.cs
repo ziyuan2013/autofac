@@ -13,9 +13,9 @@ namespace Autofac.Tests
         public void ClosesOpenGenericType()
         {
             var container = new Container();
-            //container.RegisterGenericType(typeof(List<>))
-            //    .As(typeof(ICollection<>))
-            //    .UnsharedInstances();
+            container.RegisterGenericType(typeof(List<>))
+                .As(typeof(ICollection<>))
+                .UnsharedInstances();
 
             ICollection<int> coll = container.Resolve<ICollection<int>>();
             ICollection<int> coll2 = container.Resolve<ICollection<int>>();
@@ -30,8 +30,8 @@ namespace Autofac.Tests
         public void GenericTypeRegistrationExposesImplementationType()
         {
             var container = new Container();
-            //container.RegisterGenericType(typeof(List<>))
-            //    .As(typeof(IEnumerable<>));
+            container.RegisterGenericType(typeof(List<>))
+                .As(typeof(IEnumerable<>));
 
             IComponentRegistration cr;
             Assert.IsTrue(container.ComponentRegistry.TryGetRegistration(
@@ -44,10 +44,10 @@ namespace Autofac.Tests
         {
             int activatingFired = 0;
             var container = new Container();
-            //container.RegisterGenericType(typeof(List<>))
-            //    .As(typeof(IEnumerable<>))
-            //    .UsingConstructor() // necessary to prevent greediness
-            //    .OnActivating((s, e) => ++activatingFired);
+            container.RegisterGenericType(typeof(List<>))
+                .As(typeof(IEnumerable<>))
+                .UsingConstructor() // necessary to prevent greediness
+                .OnActivating(o => ++activatingFired);
 
             container.Resolve<IEnumerable<int>>();
             Assert.AreEqual(1, activatingFired);

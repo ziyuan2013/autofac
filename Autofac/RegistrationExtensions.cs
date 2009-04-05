@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Globalization;
 using Autofac.GeneratedFactories;
 using Autofac.OpenGenerics;
+using Autofac.EntryPoints;
 
 namespace Autofac
 {
@@ -130,6 +131,24 @@ namespace Autofac
             var registrar = new DynamicRegistrar();
             container.ComponentRegistry.AddDynamicRegistrationSource(new DynamicRegistrationSource(registrar, activatorGenerator));
             return new DynamicReflectiveRegistrar(registrar, activatorGenerator);
+        }
+
+        public static void RegisterLifetimeEntryPoint<TDelegate>(this IContainer container, object scopeTag, Func<IComponentContext, IEnumerable<Parameter>, object> entryPointBinding)
+            where TDelegate : class
+        {
+            Enforce.ArgumentNotNull(container, "container");
+            Enforce.ArgumentNotNull(entryPointBinding, "entryPointBinding");
+
+            var entrypointGenerator = new LifetimeEntryPointGenerator<TDelegate>(entryPointBinding, scopeTag);
+
+            var inner = container.RegisterDelegate<TDelegate>((c, p) => entrypointGenerator.GenerateEntryPoint(c, p))
+                .InstancePerLifetimeScope();
+        }
+
+        public static void RegisterLifetimeEntryPoint<TDelegate>(this IContainer container, Func<IComponentContext, IEnumerable<Parameter>, object> entryPointBinding)
+            where TDelegate : class
+        {
+            RegisterLifetimeEntryPoint<TDelegate>(container, null, entryPointBinding);
         }
     }
 }

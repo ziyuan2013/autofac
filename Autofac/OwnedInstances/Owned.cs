@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Autofac.Disposal;
 
-namespace Autofac
+namespace Autofac.OwnedInstances
 {
     public class Owned<T> : Disposable
     {

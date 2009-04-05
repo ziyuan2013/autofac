@@ -19,12 +19,9 @@ namespace Autofac.GeneratedFactories
             Enforce.ArgumentNotNull(registeredServicesTest, "registeredServicesTest");
 
             var ts = service as TypedService;
-            if (ts != null &&
-                ts.ServiceType.IsGenericType &&
-                ts.ServiceType.GetGenericTypeDefinition().FullName.StartsWith("System.Func"))
+            if (ts != null && ts.ServiceType.IsFunction())
             {
-                var genericArgs = ts.ServiceType.GetGenericArguments();
-                var resultType = genericArgs[genericArgs.Length - 1];
+                var resultType = ts.ServiceType.FunctionReturnType();
                 var resultTypeService = new TypedService(resultType);
 
                 if (registeredServicesTest(resultTypeService))

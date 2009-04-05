@@ -807,8 +807,8 @@ namespace Autofac.Tests
             var lifetime = container.BeginLifetimeScope();
             var hello = lifetime.Resolve<string>();
 
-            // The context in Activated should be the root one, as hello
-            // is a singleton - not the nested one.
+            // The context in Activated should be the nested one, as
+            // hello is per-lifetime-scope.
             Assert.AreSame(lifetime.Resolve<object>(), fromContext);
         }
 
@@ -847,8 +847,7 @@ namespace Autofac.Tests
             var lifetime = container.BeginLifetimeScope();
             var hello = lifetime.Resolve<string>();
 
-            // The context in Activated should be the root one, as hello
-            // is a singleton - not the nested one.
+            // The context in Activated should be the nested one.
             Assert.AreSame(lifetime.Resolve<object>(), fromContext);
         }
 

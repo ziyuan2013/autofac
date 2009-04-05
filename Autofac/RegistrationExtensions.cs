@@ -128,7 +128,7 @@ namespace Autofac
         public static IDynamicReflectiveRegistrar RegisterGenericType(this IContainer container, Type openGenericType)
         {
             var activatorGenerator = new OpenGenericActivatorGenerator(openGenericType);
-            var registrar = new DynamicRegistrar();
+            var registrar = new DynamicRegistrar(new TypedService(openGenericType));
             container.ComponentRegistry.AddDynamicRegistrationSource(new DynamicRegistrationSource(registrar, activatorGenerator));
             return new DynamicReflectiveRegistrar(registrar, activatorGenerator);
         }

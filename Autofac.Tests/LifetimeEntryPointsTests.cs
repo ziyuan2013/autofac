@@ -81,13 +81,5 @@ namespace Autofac.Tests
             var ret = container.Resolve<AddOperation>().Invoke(1, 2);
             Assert.AreEqual(3, ret);
         }
-
-        public delegate void AddAction(int a, int b);
-
-        [Test]
-        public void ExecutesActionInNestedScope()
-        {
-            Assert.Fail();
-        }
     }
 }

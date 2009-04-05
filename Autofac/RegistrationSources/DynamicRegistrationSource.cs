@@ -72,6 +72,12 @@ namespace Autofac.RegistrationSources
                 services,
                 _registrationData.ExtendedProperties);
 
+            foreach (var activatingHandler in _registrationData.ActivatingHandlers)
+                registration.Activating += activatingHandler;
+
+            foreach (var activatedHandler in _registrationData.ActivatedHandlers)
+                registration.Activated += activatedHandler;
+
             return true;
         }
     }

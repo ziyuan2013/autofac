@@ -96,6 +96,11 @@ namespace Autofac.Syntax
             return As(new TypedService(typeof(TService1)), new TypedService(typeof(TService2)), new TypedService(typeof(TService3)));
         }
 
+        public IConcreteRegistrar<T> As(params Type[] services)
+        {
+            return As(services.Select(t => new TypedService(t)).Cast<Service>().ToArray());
+        }
+
         public IConcreteRegistrar<T> As(params Service[] services)
         {
             Enforce.ArgumentNotNull(services, "services");
@@ -113,6 +118,7 @@ namespace Autofac.Syntax
 
         public IConcreteRegistrar<T> OnActivating(Action<ActivatingEventArgs<T>> handler)
         {
+            Enforce.ArgumentNotNull(handler, "handler");
             ActivatingHandlers.Add((s, e) =>
             {
                 handler(new ActivatingEventArgs<T>(e.Context, e.Component, (T)e.Instance));

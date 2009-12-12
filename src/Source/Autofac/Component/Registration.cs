@@ -119,7 +119,7 @@ namespace Autofac.Component
                     instance = preparingArgs.Instance ??
                         Activator.ActivateInstance(context, preparingArgs.Parameters);
 
-                    var activatingArgs = new ActivatingEventArgs(context, this, instance);
+                    var activatingArgs = new ActivatingEventArgs(context, this, parameters, instance);
                     Activating(this, activatingArgs);
 
                     instance = activatingArgs.Instance;

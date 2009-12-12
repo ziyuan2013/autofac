@@ -287,5 +287,19 @@ namespace Autofac.Tests.Builder
             var invokee = inner.Resolve<Invokee>();
             Assert.AreEqual(pval, invokee.Param);
         }
+
+        [Test]
+        public void ActivatingArgsSuppliesParameters()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<Invokee>()
+                .WithScope(InstanceScope.Container)
+                .OnActivating((s, e) => ((Invokee)e.Instance).Method(e.Parameters.TypedAs<int>()));
+            var container = builder.Build();
+            
+            var pval = 12;
+            var invokee = container.Resolve<Invokee>(TypedParameter.From(pval));
+            Assert.AreEqual(pval, invokee.Param);
+        }
     }
 }

@@ -4,6 +4,19 @@
         <name>Autofac</name>
     </assembly>
     <members>
+        <member name="T:Autofac.ContainerExtensions">
+            <summary>
+            Extension methods for <see cref="T:Autofac.IContainer"/>
+            </summary>
+        </member>
+        <member name="M:Autofac.ContainerExtensions.Build(Autofac.IContainer,System.Action{Autofac.Builder.ContainerBuilder})">
+            <summary>
+            Builds the specified registration into the container, 
+            simplifying addition of simple registrations to the container.
+            </summary>
+            <param name="container">The container.</param>
+            <param name="registration">The registration.</param>
+        </member>
         <member name="T:Autofac.GeneratedFactories.FactoryGenerator">
             <summary>
             Generates context-bound closures that represent factories from
@@ -109,12 +122,13 @@
             Fired during the activation process to allow instances to be proxied or swapped.
             </summary>
         </member>
-        <member name="M:Autofac.ActivatingEventArgs.#ctor(Autofac.IContext,Autofac.IComponentRegistration,System.Object)">
+        <member name="M:Autofac.ActivatingEventArgs.#ctor(Autofac.IContext,Autofac.IComponentRegistration,System.Collections.Generic.IEnumerable{Autofac.Parameter},System.Object)">
             <summary>
             Initializes a new instance of the <see cref="T:Autofac.ActivatingEventArgs"/> class.
             </summary>
             <param name="context">The context.</param>
             <param name="component">The component.</param>
+            <param name="parameters">The parameters.</param>
             <param name="instance">The instance.</param>
         </member>
         <member name="P:Autofac.ActivatingEventArgs.Context">
@@ -125,6 +139,11 @@
         <member name="P:Autofac.ActivatingEventArgs.Component">
             <summary>
             The component providing the instance being activated.
+            </summary>
+        </member>
+        <member name="P:Autofac.ActivatingEventArgs.Parameters">
+            <summary>
+            The parameters supplied to the activator.
             </summary>
         </member>
         <member name="P:Autofac.ActivatingEventArgs.Instance">
@@ -3604,8 +3623,10 @@
         <member name="M:Autofac.Builder.Module.Load(Autofac.Builder.ContainerBuilder)">
             <summary>
             Override to add registrations to the container.
+            Note that the ContainerBuilder parameter is not the same one
+            that the module is being registered by (i.e. it can have its own defaults.)
             </summary>
-            <param name="builder">The builder.</param>
+            <param name="moduleBuilder">The builder.</param>
         </member>
         <member name="M:Autofac.Builder.Module.AttachToComponentRegistration(Autofac.IContainer,Autofac.IComponentRegistration)">
             <summary>

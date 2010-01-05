@@ -58,6 +58,7 @@
     <Compile Include="AssertionHelpers.cs" />
     <Compile Include="Builder\ActivatingHandlerFixture.cs" />
     <Compile Include="Builder\AutomaticRegistrationBuilderFixture.cs" />
+    <Compile Include="Builder\RegisterClosedTypesOfFixture.cs" />
     <Compile Include="ComponentRegisteredEventArgsFixture.cs" />
     <Compile Include="Component\Activation\ServiceListActivatorFixture.cs" />
     <Compile Include="Component\DescriptorFixture.cs" />

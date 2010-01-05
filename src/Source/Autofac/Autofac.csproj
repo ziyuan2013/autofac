@@ -49,6 +49,11 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Builder\ContainerBuilderResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ContainerBuilderResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ContainerExtensions.cs" />
     <Compile Include="GeneratedFactories\FactoryGenerator.cs" />
     <Compile Include="Builder\GeneratedFactoryExtensions.cs" />
@@ -282,6 +287,10 @@
     <Compile Include="UniqueService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Builder\ContainerBuilderResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ContainerBuilderResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Component\DescriptorResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>DescriptorResources.Designer.cs</LastGenOutput>

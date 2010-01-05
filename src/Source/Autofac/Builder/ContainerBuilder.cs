@@ -294,5 +294,77 @@ namespace Autofac.Builder
 			// if the default is otherwise.
 			return AttachRegistrar(new ProvidedInstanceRegistrar(instance, typeof(T)));
 		}
+
+        /// <summary>
+        /// Scans the types in an assembly and registers those that support any base or interface that closes the 
+        /// provided open generic service type.
+        /// </summary>
+        /// <param name="openGenericServiceType">The open generic interface or base class type for which implementations will be found.</param>
+        /// <param name="assembly">The assembly to scan for the matching types.</param>
+        public virtual void RegisterClosedTypesOf(Type openGenericServiceType, Assembly assembly)
+        {
+            Enforce.ArgumentNotNull(openGenericServiceType, "openGenericServiceType");
+            Enforce.ArgumentNotNull(assembly, "assembly");
+
+            if (!(openGenericServiceType.IsGenericTypeDefinition || openGenericServiceType.ContainsGenericParameters))
+            {
+                throw new ArgumentException(
+                    string.Format(ContainerBuilderResources.NotOpenGenericType, openGenericServiceType.FullName));
+            }
+
+            foreach (Type candidateType in assembly.GetTypes())
+            {
+                Type closedServiceType;
+                if (FindAssignableTypeThatCloses(candidateType, openGenericServiceType, out closedServiceType))
+                {
+                    Register(candidateType).As(closedServiceType);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Looks for an interface on the candidate type that closes the provided open generic interface type.
+        /// </summary>
+        /// <param name="candidateType">The type that is being checked for the interface.</param>
+        /// <param name="openGenericServiceType">The open generic service type to locate.</param>
+        /// <param name="closedServiceType">The type of the closed service if found.</param>
+        /// <returns>True if a closed implementation was found; otherwise false.</returns>
+        static bool FindAssignableTypeThatCloses(Type candidateType, Type openGenericServiceType, out Type closedServiceType)
+        {
+            closedServiceType = null;
+
+            if (candidateType.IsAbstract) return false;
+
+            foreach (Type interfaceType in GetTypesAssignableFrom(candidateType))
+            {
+                if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == openGenericServiceType)
+                {
+                    closedServiceType = interfaceType;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the interface and base types that given a type is assignable from.
+        /// </summary>
+        /// <param name="candidateType">The type to find assignable types for.</param>
+        /// <returns>A list of the assignable interface and base types.</returns>
+        static IEnumerable<Type> GetTypesAssignableFrom(Type candidateType)
+        {
+            foreach (Type interfaceType in candidateType.GetInterfaces())
+            {
+                yield return interfaceType;
+            }
+
+            Type nextType = candidateType;
+            while (nextType != typeof(object))
+            {
+                yield return nextType;
+                nextType = nextType.BaseType;
+            }
+        }
 	}
 }

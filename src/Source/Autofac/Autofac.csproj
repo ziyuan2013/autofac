@@ -55,8 +55,7 @@
       <DependentUpon>ContainerBuilderResources.resx</DependentUpon>
     </Compile>
     <Compile Include="ContainerExtensions.cs" />
-    <Compile Include="GeneratedFactories\FactoryGenerator.cs" />
-    <Compile Include="Builder\GeneratedFactoryExtensions.cs" />
+    <Compile Include="Builder\FactoryGenerator.cs" />
     <Compile Include="ActivatedEventArgs.cs" />
     <Compile Include="ActivatingEventArgs.cs" />
     <Compile Include="ComponentRegisteredEventArgs.cs" />

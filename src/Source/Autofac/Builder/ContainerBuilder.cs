@@ -323,6 +323,67 @@ namespace Autofac.Builder
         }
 
         /// <summary>
+        /// Registers the factory delegate.
+        /// </summary>
+        /// <param name="delegateType">The type of the delegate.</param>
+        /// <param name="service">The service that the delegate will return instances of.</param>
+        /// <returns>A registrar allowing configuration to continue.</returns>
+        public IConcreteRegistrar RegisterGeneratedFactory(Type delegateType, Service service)
+        {
+            Enforce.ArgumentTypeIsFunction(delegateType);
+            Enforce.ArgumentNotNull(service, "service");
+
+            var factory = new FactoryGenerator(delegateType, service);
+
+            return Register((c, p) => (object)factory.GenerateFactory(c, p))
+                .As(delegateType)
+                .ContainerScoped();
+        }
+
+        /// <summary>
+        /// Registers the factory delegate.
+        /// </summary>
+        /// <param name="delegateType">The type of the delegate.</param>
+        /// <returns>A registrar allowing configuration to continue.</returns>
+        public IConcreteRegistrar RegisterGeneratedFactory(Type delegateType)
+        {
+            Enforce.ArgumentTypeIsFunction(delegateType);
+
+            var returnType = delegateType.GetMethod("Invoke").ReturnType;
+            return RegisterGeneratedFactory(delegateType, new TypedService(returnType));
+        }
+
+        /// <summary>
+        /// Registers the factory delegate.
+        /// </summary>
+        /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
+        /// <param name="service">The service that the delegate will return instances of.</param>
+        /// <returns>A registrar allowing configuration to continue.</returns>
+        public IConcreteRegistrar RegisterGeneratedFactory<TDelegate>(Service service)
+            where TDelegate : class
+        {
+            Enforce.ArgumentNotNull(service, "service");
+
+            var factory = new FactoryGenerator(typeof(TDelegate), service);
+
+            return Register((c, p) => factory.GenerateFactory<TDelegate>(c, p))
+                .ContainerScoped();
+        }
+        /// <summary>
+        /// Registers the factory delegate.
+        /// </summary>
+        /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
+        /// <returns>A registrar allowing configuration to continue.</returns>
+        public IConcreteRegistrar RegisterGeneratedFactory<TDelegate>()
+            where TDelegate : class
+        {
+            Enforce.ArgumentTypeIsFunction(typeof(TDelegate));
+
+            var returnType = typeof(TDelegate).GetMethod("Invoke").ReturnType;
+            return RegisterGeneratedFactory<TDelegate>(new TypedService(returnType));
+        }
+
+        /// <summary>
         /// Looks for an interface on the candidate type that closes the provided open generic interface type.
         /// </summary>
         /// <param name="candidateType">The type that is being checked for the interface.</param>

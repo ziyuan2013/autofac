@@ -34,18 +34,28 @@ namespace Autofac.Component.Activation
     /// </summary>
 	public class DelegateActivator : IActivator
 	{
-		ComponentActivator _activator;
+        readonly ComponentActivator _activator;
+        readonly Type _implementor;
 
         /// <summary>
-		/// Create a DelegateActivator.
+        /// Create a DelegateActivator.
         /// </summary>
         /// <param name="creator">A creation delegate. Required.</param>
-		public DelegateActivator(ComponentActivator creator)
-		{
-            Enforce.ArgumentNotNull(creator, "creator");
+        /// <param name="implementor"></param>
+        public DelegateActivator(ComponentActivator creator, Type implementor)
+        {
+            _activator = Enforce.ArgumentNotNull(creator, "creator");
+            _implementor = Enforce.ArgumentNotNull(implementor, "implementor");
+        }
 
-			_activator = creator;
-		}
+        /// <summary>
+        /// Create a DelegateActivator.
+        /// </summary>
+        /// <param name="creator">A creation delegate. Required.</param>
+        public DelegateActivator(ComponentActivator creator)
+            : this(creator, typeof(object))
+        {
+        }
 
         /// <summary>
         /// Create a component instance, using container
@@ -69,7 +79,8 @@ namespace Autofac.Component.Activation
 			object instance = _activator(context, parameters);
 			
 			if (instance == null)
-                throw new InvalidOperationException(DelegateActivatorResources.CreationDelegateMustNotReturnNull);
+                throw new DependencyResolutionException(string.Format(
+                    DelegateActivatorResources.CreationDelegateMustNotReturnNull, _implementor));
 			
 			return instance;
 		}

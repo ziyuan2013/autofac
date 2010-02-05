@@ -10,20 +10,36 @@ namespace Autofac.Tests.Component.Activation
     {
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructNull()
+        public void ConstructorDoesNotAcceptNull()
         {
             new DelegateActivator(null);
         }
 
         [Test]
-        public void ActivateInstance()
+        public void ActivateInstanceReturnsResultOfCallingDelegate()
         {
-            object instance = new object();
+            var instance = new object();
 
-            DelegateActivator target =
+            var target =
                 new DelegateActivator((c, p) => instance);
 
             Assert.AreSame(instance, target.ActivateInstance(new Container(), Enumerable.Empty<Parameter>()));
+        }
+
+        [Test]
+        public void WhenDelegateReturnsNullImplementorIsIncludedInMessage()
+        {
+            var target = new DelegateActivator((c, p) => null, typeof(string));
+            try
+            {
+                target.ActivateInstance(Container.Empty, Enumerable.Empty<Parameter>());
+                Assert.Fail("Expected exception not thrown.");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsInstanceOfType(typeof(DependencyResolutionException), ex);
+                Assert.That(ex.Message.Contains(typeof(string).ToString()));
+            }
         }
 	}
 }

@@ -117,18 +117,6 @@ namespace Autofac.Registrars
         }
 
         /// <summary>
-        /// The services exposed by this registration.
-        /// </summary>
-        /// <value></value>
-		protected override IEnumerable<Service> Services
-		{
-			get
-			{
-				return base.Services;
-			}
-		}
-
-        /// <summary>
         /// Add a service to be exposed by the component.
         /// </summary>
         /// <param name="service">The service to add.</param>
@@ -136,7 +124,7 @@ namespace Autofac.Registrars
         {
             Enforce.ArgumentNotNull(service, "service");
 
-            TypedService serviceType = service as TypedService;
+            var serviceType = service as TypedService;
             if (serviceType != null && _implementor != typeof(object) && !serviceType.ServiceType.IsAssignableFrom(_implementor))
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                     ConcreteRegistrarResources.ComponentDoesNotSupportService, _implementor, service));

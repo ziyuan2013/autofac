@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CreationDelegateMustNotReturnNull" xml:space="preserve">
-    <value>The creation delegate must not return null.</value>
+    <value>A delegate registered to create instances of '{0}' returned null.</value>
   </data>
   <data name="DelegateActivatorTypeDoesNotSupportService" xml:space="preserve">
     <value>An activator of type '{0}' does not support the service '{1}'.</value>

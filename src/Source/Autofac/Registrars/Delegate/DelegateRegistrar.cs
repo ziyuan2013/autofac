@@ -34,7 +34,8 @@ namespace Autofac.Registrars.Delegate
     /// </summary>
     public class DelegateRegistrar : ConcreteRegistrar<IConcreteRegistrar>, IConcreteRegistrar
 	{
-        ComponentActivator _creator;
+        readonly ComponentActivator _creator;
+        readonly Type _implementor;
 
         /// <summary>
         /// Initializes a new instance of the DelegateRegistrar&lt;TComponent&gt; class.
@@ -46,6 +47,7 @@ namespace Autofac.Registrars.Delegate
 		{
             Enforce.ArgumentNotNull(creator, "creator");
             _creator = creator;
+            _implementor = implementor;
 		}
 
         /// <summary>
@@ -54,7 +56,7 @@ namespace Autofac.Registrars.Delegate
         /// <returns>An activator.</returns>
         protected override IActivator CreateActivator()
         {
-            return new DelegateActivator(_creator);
+            return new DelegateActivator(_creator, _implementor);
         }
 
         /// <summary>

@@ -74,16 +74,7 @@ namespace Autofac.Integration.Web.Forms
 
             var page = target as Page;
             if (page != null)
-                page.PreInit += (s, e) =>
-				{ 
-					/*
-					   reference the Page.Master property to force the MasterPage
-					   (if one exists) to be integrated into the page's control
-					   tree immediately instead of following all the PreInit handlers
-					 */
-					var ignored = page.Master;
-					InjectUserControls(injector, page);
-				};
+                page.PreLoad += (s, e) => InjectUserControls(injector, page);
         }
 
         static void InjectUserControls(Func<object, object> injector, Control parent)

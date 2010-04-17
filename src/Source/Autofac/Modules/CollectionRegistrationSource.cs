@@ -66,9 +66,8 @@ namespace Autofac.Modules
                         new DelegateActivator((c, p) =>
                         {
                             var ctr = c.Resolve<IContainer>();
-                            var items = AllRegistrationsInHierarchy(ctr)
-                                .Where(cr => cr.Descriptor.Services.Contains(elementTypeService))
-                                .Select(cr => ctr.Resolve(cr.Descriptor.Id, p))
+                            var items = AllRegistrationsInHierarchySupporting(ctr, elementTypeService)
+                                .Select(d => ctr.Resolve(d.Id, p))
                                 .ToArray();
                             var result = Array.CreateInstance(elementType, items.Length);
                             items.CopyTo(result, 0);
@@ -85,15 +84,19 @@ namespace Autofac.Modules
             return false;
         }
 
-        IEnumerable<IComponentRegistration> AllRegistrationsInHierarchy(IContainer container)
+        static IEnumerable<IComponentDescriptor> AllRegistrationsInHierarchySupporting(IContainer container, Service service)
         {
             var registrations = container.ComponentRegistrations;
             while (container.OuterContainer != null)
             {
                 container = container.OuterContainer;
-                registrations = registrations.Union(container.ComponentRegistrations);
+                registrations = registrations.Concat(container.ComponentRegistrations);
             }
-            return registrations;
+
+            return registrations
+                .Select(r => r.Descriptor)
+                .Where(d => d.Services.Contains(service))
+                .Distinct();
         }
     }
 }

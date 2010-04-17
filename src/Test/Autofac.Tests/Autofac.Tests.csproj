@@ -45,6 +45,7 @@
     <Reference Include="System">
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml">
       <Private>True</Private>
     </Reference>
@@ -65,6 +66,7 @@
     <Compile Include="Configuration\ConfigurationSettingsReaderFixture.cs" />
     <Compile Include="ContainerExtensionsFixture.cs" />
     <Compile Include="Builder\GeneratedFactoryFixture.cs" />
+    <Compile Include="Modules\CollectionRegistrationSourceTests.cs" />
     <Compile Include="Modules\ImplicitCollectionSupportModuleFixture.cs" />
     <Compile Include="NamedParameterTests.cs" />
     <Compile Include="Registrars\ConcreteRegistrarFixture.cs" />

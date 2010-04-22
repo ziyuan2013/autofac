@@ -32,7 +32,11 @@ namespace Autofac.Builder
     /// Generates activators in an IRegistrationSource.
     /// </summary>
     /// <typeparam name="TActivatorData">Data associated with the specific kind of activator.</typeparam>
+#if !(SL2 || SL3 || NET35) 
     public interface IActivatorGenerator<in TActivatorData>
+#else
+    public interface IActivatorGenerator<TActivatorData>
+#endif
     {
         /// <summary>
         /// Given a requested service and registration data, attempt to generate an

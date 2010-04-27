@@ -53,6 +53,7 @@ namespace Autofac.Features.Scanning
                         t.IsClass &&
                         !t.IsAbstract &&
                         !t.IsGenericTypeDefinition &&
+                        !t.IsFunction() &&
                         rb.ActivatorData.Filters.All(p => p(t))))
                 {
                     var scanned = RegistrationBuilder.ForType(t)

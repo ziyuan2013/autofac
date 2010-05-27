@@ -219,5 +219,18 @@ namespace Autofac.Tests
             var r = c.RegistrationFor<ICommand<UndoCommandData>>();
             Assert.That(r.Services.Contains(new TypedService(typeof(ICommand<RedoCommandData>))));
         }
+
+        [Test]
+        public void WhenScannedTypesAreRegistered_OnRegisteredHandlersAreCalled()
+        {
+            var onRegisteredCalled = false;
+
+            var cb = new ContainerBuilder();
+            cb.RegisterAssemblyTypes(typeof(AComponent).Assembly)
+                .OnRegistered(e => onRegisteredCalled = true);
+            cb.Build();
+
+            Assert.That(onRegisteredCalled);
+        }
     }
 }

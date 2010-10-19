@@ -90,8 +90,7 @@
     <RemoveDir Directories="$(BuildPath)" />
   </Target>
 
-  <Target Name="Rebuild" DependsOnTargets="Clean;Build;" />
-  
+  <Target Name="Rebuild" DependsOnTargets="Clean;Build;" />  
   <Target Name="Integrate" DependsOnTargets="Clean;Test;Report" />
   <Target Name="Release" DependsOnTargets="Clean;_Version;Build;Test;Report;Distrib" />
 

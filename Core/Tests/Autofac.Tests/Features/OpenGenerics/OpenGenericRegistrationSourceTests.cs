@@ -28,7 +28,7 @@ namespace Autofac.Tests.Features.OpenGenerics
             Assert.AreEqual(typeof(I<int>),
                 r.Services.Cast<TypedService>().Single().ServiceType);
 
-            var activatedInstance = r.Activator.ActivateInstance(Container.Empty, Factory.NoParameters);
+            var activatedInstance = r.Activator.ActivateInstance(new ContainerBuilder().Build(), Factory.NoParameters);
             Assert.IsInstanceOf<A1<int>>(activatedInstance);
         }
 
@@ -38,7 +38,6 @@ namespace Autofac.Tests.Features.OpenGenerics
         }
 
         [Test]
-        [IgnoreOnPhone("Reflection does not provide information to check")]
         public void DoesNotGenerateActivatorWhenConstructorConstraintBroken()
         {
             Assert.IsFalse(CanGenerateActivatorForI<string>(typeof(AWithNew<>)));
@@ -58,7 +57,6 @@ namespace Autofac.Tests.Features.OpenGenerics
         }
 
         [Test]
-        [IgnoreOnPhone("Reflection does not provide information to check")]
         public void DoesNotGenerateActivatorWhenTypeConstraintBroken()
         {
             Assert.IsFalse(CanGenerateActivatorForI<string>(typeof(AWithDisposable<>)));
@@ -74,7 +72,6 @@ namespace Autofac.Tests.Features.OpenGenerics
             where T : class { }
 
         [Test]
-        [IgnoreOnPhone("Reflection does not provide information to check")]
         public void DoesNotGenerateActivatorWhenClassConstraintBroken()
         {
             Assert.IsFalse(CanGenerateActivatorForI<int>(typeof(AWithClass<>)));
@@ -90,7 +87,6 @@ namespace Autofac.Tests.Features.OpenGenerics
             where T : struct { }
 
         [Test]
-        [IgnoreOnPhone("Reflection does not provide information to check")]
         public void DoesNotGenerateActivatorWhenValueConstraintBroken()
         {
             Assert.IsFalse(CanGenerateActivatorForI<string>(typeof(AWithValue<>)));
@@ -141,7 +137,6 @@ namespace Autofac.Tests.Features.OpenGenerics
         public class Repository<T, TId> where T : IEntity<TId> { }
 
         [Test]
-        [Ignore("Requires Type.GUID that is not available in PCL")]
         public void SupportsCodependentTypeConstraints()
         {
             var g = ConstructSource(typeof(Repository<,>));
@@ -182,7 +177,6 @@ namespace Autofac.Tests.Features.OpenGenerics
         }
 
         [Test]
-        [IgnoreOnPhone("Fails because IsCompatibleWithGenericParameterConstraints cannot check contraints")]
         public void IgnoresServicesThatDoNotSupplyAllParameters()
         {
             Assert.That(!SourceCanSupply<IHaveTwoParameters<int,int>>(typeof(HaveTwoParameters<,>)));
@@ -211,7 +205,7 @@ namespace Autofac.Tests.Features.OpenGenerics
                 return false;
 
             var registration = registrations.Single();
-            var instance = registration.Activator.ActivateInstance(Container.Empty, Factory.NoParameters);
+            var instance = registration.Activator.ActivateInstance(new ContainerBuilder().Build(), Factory.NoParameters);
 
             Assert.That(closedServiceType.IsAssignableFrom(instance.GetType()));
             return true;

@@ -24,6 +24,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -43,7 +44,7 @@ namespace Autofac.Util
         public static bool TryGetDeclaringProperty(this ParameterInfo pi, out PropertyInfo prop)
         {
             var mi = pi.Member as MethodInfo;
-            if (mi != null && mi.IsSpecialName && mi.Name.StartsWith("set_"))
+            if (mi != null && mi.IsSpecialName && mi.Name.StartsWith("set_", StringComparison.Ordinal) && mi.DeclaringType != null)
             {
                 prop = mi.DeclaringType.GetProperty(mi.Name.Substring(4));
                 return true;
@@ -70,9 +71,10 @@ namespace Autofac.Util
             if (mex == null ||
                 !(mex.Member is PropertyInfo))
                 throw new ArgumentException(string.Format(
+                    CultureInfo.CurrentCulture,
                     ReflectionExtensionsResources.ExpressionNotPropertyAccessor,
                     propertyAccessor));
-            return (PropertyInfo) mex.Member;
+            return (PropertyInfo)mex.Member;
         }
 
         /// <summary>
@@ -89,9 +91,42 @@ namespace Autofac.Util
             var callExpression = methodCallExpression.Body as MethodCallExpression;
             if (callExpression == null)
                 throw new ArgumentException(string.Format(
+                    CultureInfo.CurrentCulture,
                     ReflectionExtensionsResources.ExpressionNotMethodCall,
                     methodCallExpression));
             return callExpression.Method;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ConstructorInfo"/> for the new operation called in the expression.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The type on which the constructor is called.</typeparam>
+        /// <param name="constructorCallExpression">Expression demonstrating how the constructor is called.</param>
+        /// <returns>The <see cref="ConstructorInfo"/> for the called constructor.</returns>
+        public static ConstructorInfo GetConstructor<TDeclaring>(
+            Expression<Func<TDeclaring>> constructorCallExpression)
+        {
+            if (constructorCallExpression == null) throw new ArgumentNullException("constructorCallExpression");
+            var callExpression = constructorCallExpression.Body as NewExpression;
+            if (callExpression == null)
+                throw new ArgumentException(string.Format(
+                    CultureInfo.CurrentCulture,
+                    ReflectionExtensionsResources.ExpressionNotConstructorCall,
+                    constructorCallExpression));
+            return callExpression.Constructor;
+        }
+
+        /// <summary>
+        /// Retrieves a custom attribute of a specified type that is applied to a specified member,
+        /// and optionally inspects the ancestors of that member.
+        /// </summary>
+        /// <typeparam name="T">The type of attribute to search for.</typeparam>
+        /// <param name="element">The member to inspect.</param>
+        /// <param name="inherit"><c>true</c> to inspect the ancestors of element; otherwise, <c>false</c>.</param>
+        /// <returns>A custom attribute that matches <typeparamref name="T"/>, or <c>null</c> if no such attribute is found.</returns>
+        public static T GetCustomAttribute<T>(this MemberInfo element, bool inherit) where T : Attribute
+        {
+            return (T)Attribute.GetCustomAttribute(element, typeof(T), inherit);
         }
     }
 }

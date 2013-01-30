@@ -35,6 +35,20 @@ namespace Autofac.Tests.Integration.Mvc
     [TestFixture]
     public class AutofacDependencyResolverFixture
     {
+        private IDependencyResolver _originalResolver = null;
+
+        [SetUp]
+        public void SetUp()
+        {
+            this._originalResolver = DependencyResolver.Current;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            DependencyResolver.SetResolver(this._originalResolver);
+        }
+
         [Test]
         public void CurrentPropertyExposesTheCorrectResolver()
         {
@@ -119,7 +133,7 @@ namespace Autofac.Tests.Integration.Mvc
         {
             var container = new ContainerBuilder().Build();
             Action<ContainerBuilder> configurationAction = builder => builder.Register(c => new object());
-            var lifetimeScopeProvider = new StubLifetimeScopeProvider(container, configurationAction);
+            var lifetimeScopeProvider = new StubLifetimeScopeProvider(container);
             var resolver = new AutofacDependencyResolver(container, lifetimeScopeProvider, configurationAction);
 
             var service = resolver.GetService(typeof(object));
@@ -127,6 +141,15 @@ namespace Autofac.Tests.Integration.Mvc
 
             Assert.That(service, Is.Not.Null);
             Assert.That(services.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void DerivedResolverTypesCanStillBeCurrentResolver()
+        {
+            var container = new ContainerBuilder().Build();
+            var provider = new DerivedAutofacDependencyResolver(container);
+            DependencyResolver.SetResolver(provider);
+            Assert.AreEqual(provider, AutofacDependencyResolver.Current, "You should be able to derive from AutofacDependencyResolver and still use the Current property.");
         }
 
         [Test]
@@ -179,6 +202,14 @@ namespace Autofac.Tests.Integration.Mvc
             var services = resolver.GetServices(typeof(object));
 
             Assert.That(services.Count(), Is.EqualTo(1));
+        }
+
+        private class DerivedAutofacDependencyResolver : AutofacDependencyResolver
+        {
+            public DerivedAutofacDependencyResolver(IContainer container)
+                : base(container, new StubLifetimeScopeProvider(container))
+            {
+            }
         }
     }
 }

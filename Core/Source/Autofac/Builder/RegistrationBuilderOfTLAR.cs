@@ -30,6 +30,7 @@ using System.Linq;
 using Autofac.Core;
 using Autofac.Core.Activators.Reflection;
 using Autofac.Core.Lifetime;
+using Autofac.Features.Metadata;
 
 namespace Autofac.Builder
 {
@@ -127,15 +128,15 @@ namespace Autofac.Builder
         }
 
         /// <summary>
-        /// Configure the component so that every dependent component or call to Resolve()
-        /// within a ILifetimeScope tagged with the provided tag value gets the same, shared instance.
+        /// Configure the component so that every dependent component or call to Resolve() within
+        /// a ILifetimeScope tagged with any of the provided tags value gets the same, shared instance.
         /// Dependent components in lifetime scopes that are children of the tagged scope will
         /// share the parent's instance. If no appropriately tagged scope can be found in the
         /// hierarchy an <see cref="DependencyResolutionException"/> is thrown.
         /// </summary>
         /// <param name="lifetimeScopeTag">Tag applied to matching lifetime scopes.</param>
         /// <returns>A registration builder allowing further configuration of the component.</returns>
-        public IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> InstancePerMatchingLifetimeScope(object lifetimeScopeTag)
+        public IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> InstancePerMatchingLifetimeScope(params object[] lifetimeScopeTag)
         {
             if (lifetimeScopeTag == null) throw new ArgumentNullException("lifetimeScopeTag");
             RegistrationData.Sharing = InstanceSharing.Shared;
@@ -248,7 +249,7 @@ namespace Autofac.Builder
                 t.FullName != null
                 ? new TypedService(t)
                 : new TypedService(t.GetGenericTypeDefinition()))
-                .Cast<Service>().ToArray()); 
+                .Cast<Service>().ToArray());
         }
 
         /// <summary>
@@ -364,18 +365,16 @@ namespace Autofac.Builder
         /// </summary>
         /// <param name="wiringFlags">Set wiring options such as circular dependency wiring support.</param>
         /// <returns>A registration builder allowing further configuration of the component.</returns>
-        public IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> PropertiesAutowired(PropertyWiringFlags wiringFlags)
+        public IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> PropertiesAutowired(PropertyWiringOptions wiringFlags)
         {
-            var injector = new AutowiringPropertyInjector();
-
-            var allowCircularDependencies = 0 != (int)(wiringFlags & PropertyWiringFlags.AllowCircularDependencies);
-            var preserveSetValues = 0 != (int) (wiringFlags & PropertyWiringFlags.PreserveSetValues);
+            var allowCircularDependencies = 0 != (int)(wiringFlags & PropertyWiringOptions.AllowCircularDependencies);
+            var preserveSetValues = 0 != (int)(wiringFlags & PropertyWiringOptions.PreserveSetValues);
 
             if (allowCircularDependencies)
-                RegistrationData.ActivatedHandlers.Add((s, e) => injector.InjectProperties(e.Context, e.Instance, !preserveSetValues));
+                RegistrationData.ActivatedHandlers.Add((s, e) => AutowiringPropertyInjector.InjectProperties(e.Context, e.Instance, !preserveSetValues));
             else
-                RegistrationData.ActivatingHandlers.Add((s, e) => injector.InjectProperties(e.Context, e.Instance, !preserveSetValues));
-            
+                RegistrationData.ActivatingHandlers.Add((s, e) => AutowiringPropertyInjector.InjectProperties(e.Context, e.Instance, !preserveSetValues));
+
             return this;
         }
 

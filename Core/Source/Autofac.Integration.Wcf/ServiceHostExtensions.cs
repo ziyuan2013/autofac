@@ -24,13 +24,15 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Globalization;
+using System.Linq;
 using System.ServiceModel;
 using Autofac.Core;
 
 namespace Autofac.Integration.Wcf
 {
     /// <summary>
-    ///		Adds dependency injection related methods to service hosts.
+    /// Adds dependency injection related methods to service hosts.
     /// </summary>
     public static class ServiceHostExtensions
     {
@@ -55,8 +57,18 @@ namespace Autofac.Integration.Wcf
         /// <param name="container">The container.</param>
         public static void AddDependencyInjectionBehavior(this ServiceHostBase serviceHost, Type contractType, ILifetimeScope container)
         {
-            if (contractType == null) throw new ArgumentNullException("contractType");
-            if (container == null) throw new ArgumentNullException("container");
+            if (serviceHost == null)
+            {
+                throw new ArgumentNullException("serviceHost");
+            }
+            if (contractType == null)
+            {
+                throw new ArgumentNullException("contractType");
+            }
+            if (container == null)
+            {
+                throw new ArgumentNullException("container");
+            }
 
             var serviceBehavior = serviceHost.Description.Behaviors.Find<ServiceBehaviorAttribute>();
             if (serviceBehavior != null && serviceBehavior.InstanceContextMode == InstanceContextMode.Single)
@@ -65,11 +77,17 @@ namespace Autofac.Integration.Wcf
             IComponentRegistration registration;
             if (!container.ComponentRegistry.TryGetRegistration(new TypedService(contractType), out registration))
             {
-                var message = string.Format(ServiceHostExtensionsResources.ContractTypeNotRegistered, contractType.FullName);
+                var message = string.Format(CultureInfo.CurrentCulture, ServiceHostExtensionsResources.ContractTypeNotRegistered, contractType.FullName);
                 throw new ArgumentException(message, "contractType");
             }
+            var data = new ServiceImplementationData
+            {
+                ConstructorString = contractType.AssemblyQualifiedName,
+                ServiceTypeToHost = contractType,
+                ImplementationResolver = l => l.ResolveComponent(registration, Enumerable.Empty<Parameter>())
+            };
 
-            var behavior = new AutofacDependencyInjectionServiceBehavior(container, serviceHost.Description.ServiceType, registration);
+            var behavior = new AutofacDependencyInjectionServiceBehavior(container, data);
             serviceHost.Description.Behaviors.Add(behavior);
         }
     }

@@ -24,6 +24,8 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Web;
 
 namespace Autofac.Integration.Mvc
@@ -37,26 +39,20 @@ namespace Autofac.Integration.Mvc
     public class RequestLifetimeScopeProvider : ILifetimeScopeProvider
     {
         readonly ILifetimeScope _container;
-        readonly Action<ContainerBuilder> _configurationAction;
 
         /// <summary>
         /// Tag used to identify registrations that are scoped to the HTTP request level.
         /// </summary>
-        internal static readonly object HttpRequestTag = "httpRequest";
+        internal static readonly object HttpRequestTag = "AutofacWebRequest";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequestLifetimeScopeProvider"/> class.
         /// </summary>
         /// <param name="container">The parent container, usually the application container.</param>
-        /// <param name="configurationAction">Action on a <see cref="ContainerBuilder"/>
-        /// that adds component registations visible only in HTTP request lifetime scopes.</param>
-        public RequestLifetimeScopeProvider(ILifetimeScope container, Action<ContainerBuilder> configurationAction)
+        public RequestLifetimeScopeProvider(ILifetimeScope container)
         {
             if (container == null) throw new ArgumentNullException("container");
-
             _container = container;
-            _configurationAction = configurationAction;
-
             RequestLifetimeHttpModule.SetLifetimeScopeProvider(this);
         }
 
@@ -68,15 +64,6 @@ namespace Autofac.Integration.Mvc
             get { return _container; }
         }
 
-        /// <summary>
-        /// Gets the configuration action that adds component registations 
-        /// visible only in HTTP request lifetime scopes.
-        /// </summary>
-        protected Action<ContainerBuilder> ConfigurationAction
-        {
-            get { return _configurationAction; }
-        }
-
         static ILifetimeScope LifetimeScope
         {
             get { return (ILifetimeScope)HttpContext.Current.Items[typeof(ILifetimeScope)]; }
@@ -84,19 +71,24 @@ namespace Autofac.Integration.Mvc
         }
 
         /// <summary>
-        /// Gets a HTTP request lifetime scope that services can be resolved from.
+        /// Gets a nested lifetime scope that services can be resolved from.
         /// </summary>
-        /// <returns>A new or existing lifetime scope for the current HTTP request.</returns>
-        public ILifetimeScope GetLifetimeScope()
+        /// <param name="configurationAction">
+        /// A configuration action that will execute during lifetime scope creation.
+        /// </param>
+        /// <returns>A new or existing nested lifetime scope.</returns>
+        public ILifetimeScope GetLifetimeScope(Action<ContainerBuilder> configurationAction)
         {
             if (HttpContext.Current == null)
+            {
                 throw new InvalidOperationException(RequestLifetimeScopeProviderResources.HttpContextNotAvailable);
+            }
 
             if (LifetimeScope == null)
             {
-                if ((LifetimeScope = GetLifetimeScopeCore()) == null)
+                if ((LifetimeScope = GetLifetimeScopeCore(configurationAction)) == null)
                     throw new InvalidOperationException(
-                        string.Format(RequestLifetimeScopeProviderResources.NullLifetimeScopeReturned, GetType().FullName));
+                        string.Format(CultureInfo.CurrentCulture, RequestLifetimeScopeProviderResources.NullLifetimeScopeReturned, GetType().FullName));
             }
             return LifetimeScope;
         }
@@ -115,12 +107,16 @@ namespace Autofac.Integration.Mvc
         /// Gets a lifetime scope for the current HTTP request. This method can be overridden
         /// to alter the way that the life time scope is constructed.
         /// </summary>
+        /// <param name="configurationAction">
+        /// A configuration action that will execute during lifetime scope creation.
+        /// </param>
         /// <returns>A new lifetime scope for the current HTTP request.</returns>
-        protected virtual ILifetimeScope GetLifetimeScopeCore()
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        protected virtual ILifetimeScope GetLifetimeScopeCore(Action<ContainerBuilder> configurationAction)
         {
-            return (ConfigurationAction == null)
+            return (configurationAction == null)
                        ? ApplicationContainer.BeginLifetimeScope(HttpRequestTag)
-                       : ApplicationContainer.BeginLifetimeScope(HttpRequestTag, ConfigurationAction);
+                       : ApplicationContainer.BeginLifetimeScope(HttpRequestTag, configurationAction);
         }
     }
 }

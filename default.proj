@@ -58,6 +58,7 @@
 		<CallTarget Targets="Clean;Compile;Test;Analyze" />
 		<CallTarget Targets="Package" Condition="'$(Package)' == 'true'" />
 		<CallTarget Targets="Document" Condition="'$(Document)' == 'true'" />
+		<Message Importance="high" Text="IMPORTANT: If you are planning to release this build, be sure to run the AppCert tests in Core/Tests/Autofac.Tests.AppCert to ensure Windows Store compatibility." />
 	</Target>
 
 	<Target Name="Analyze">
@@ -83,21 +84,6 @@
 		-->
 		<MSBuild Projects="$(MSBuildProjectDirectory)\.nuget\NuGet.targets" Targets="RestorePackages" />
 		<MSBuild Projects="%(SolutionFile.FullPath)" Targets="Build" Properties="Configuration=$(BuildConfiguration)" />
-
-		<!--
-			The current build only targets .NET 4.0. It finds all the build output and puts
-			it in bin\NET40. (Note "NET40" is what NuGet uses as the framework ID for .NET 4.)
-
-			When more platforms are targeted, put the appropriate build output into bin\XYZ where
-			XYZ is the associated NuGet framework identifier. This will allow easier convention-based
-			NuGet packaging to occur.
-
-			Original build constants used for targeting:
-			* NET40 = .NET 4.0 (TargetFrameworkVersion = v4.0; AllowPartiallyTrustedCallers = true)
-			* NET35 = .NET 3.5 (TargetFrameworkVersion = v3.5; AllowPartiallyTrustedCallers = false)
-			* SILVERLIGHT;SL3;WINDOWS_PHONE = WP7 (TargetFrameworkVersion = v4.0; AllowPartiallyTrustedCallers = false)
-			* SILVERLIGHT;SL4 = SL4 (TargetFrameworkVersion = v4.0; TargetFrameworkIdentifier = Silverlight; AllowPartiallyTrustedCallers = false)
-		-->
 		<ItemGroup>
 			<SourceOutputList
 				Include="
@@ -105,34 +91,32 @@
 					%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\Autofac*.pdb;
 					%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\Autofac*.xml;
 					%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\*.config"
-				Exclude="**\*.vshost.*;**\*.CodeAnalysisLog.*" />
+				Exclude="**\*.vshost.*;%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\*.CodeAnalysisLog.*" />
 			<PortableOutputList
 				Include="
 					%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\Autofac.dll;
 					%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\Autofac.pdb;
-					%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\Autofac.xml"
-				Exclude="**\*.vshost.*;**\*.CodeAnalysisLog.*" />
+					%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\Autofac.xml;
+					%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\Autofac.Extras.CommonServiceLocator.*"
+				Exclude="**\*.vshost.*;%(SourceProject.RootDir)%(SourceProject.Directory)bin\$(BuildConfiguration)\*.CodeAnalysisLog.*" />
 		</ItemGroup>
 		<Copy SourceFiles="@(SourceOutputList)" DestinationFolder="$(BuildDirectory)\bin\net40" />
-		<Copy SourceFiles="@(PortableOutputList)" DestinationFolder="$(BuildDirectory)\bin\sl5" />
-		<Copy SourceFiles="@(PortableOutputList)" DestinationFolder="$(BuildDirectory)\bin\winrt45" />
+		<Copy SourceFiles="@(PortableOutputList)" DestinationFolder="$(BuildDirectory)\bin\portable-win+net40+sl50+wp8" />
 	</Target>
 
 	<Target Name="Document">
 		<!--
-			Dynamically generate the list of Autofac assemblies to put in the documentation so we don't
-			have to modify the doc build when assemblies change.
+			Sandcastle Help File Builder 1.9.5.0 requires the DXROOT environment variable
+			even if you manually provide a path to Sandcastle so we manually execute the
+			doc task in a small "wrapper" script after setting the environment variable.
 		-->
-		<ItemGroup>
-			<DocTarget Include="$(BuildDirectory)\bin\net40\*.dll;$(BuildDirectory)\bin\net40\*.xml" />
-		</ItemGroup>
-		<CreateProperty Value="@(DocTarget -> '&lt;DocumentationSource sourceFile=%27%(FullPath)%27 /&gt;', '')">
-			<Output TaskParameter="Value" PropertyName="DocumentationSources" />
-		</CreateProperty>
-		<MSBuild
-			ToolsVersion="4.0"
-			Projects="Documentation.shfbproj"
-			Properties="SHFBRoot=$(MSBuildProjectDirectory)\lib\SHFB;HelpFileVersion=$(AssemblyVersion);DocumentationSources=$(DocumentationSources)" />
+		<PropertyGroup>
+			<DocExec><![CDATA[
+set DXROOT=$(MSBuildProjectDirectory)\lib\Sandcastle
+MSBuild $(MSBuildProjectDirectory)\Build\Documentation.proj /p:AssemblyVersion="$(AssemblyVersion)" /p:BuildDirectory="$(BuildDirectory)"
+			]]></DocExec>
+		</PropertyGroup>
+		<Exec Command="$(DocExec)" WorkingDirectory="$(MSBuildProjectDirectory)\Build" />
 	</Target>
 
 	<Target Name="Package">
@@ -147,7 +131,7 @@
 			<!-- One set of Extras and Core items should be created for each target zip file. -->
 			<NET40ExtrasPackageItems Include="$(BuildDirectory)\bin\net40\Autofac.Extras.*" />
 			<NET40CorePackageItems Include="$(BuildDirectory)\bin\net40\Autofac.*" Exclude="@(NET40ExtrasPackageItems)" />
-			<PortablePackageItems Include="$(BuildDirectory)\bin\winrt45\Autofac.*" />
+			<PortablePackageItems Include="$(BuildDirectory)\bin\portable-win+net40+sl50+wp8\Autofac.*" />
 
 			<!-- The license file gets included with zip files; NuGet packages have a license URL. -->
 			<LicenseFile Include="$(MSBuildProjectDirectory)\License.txt" />
@@ -190,7 +174,10 @@
 		</ItemGroup>
 
 		<Message Text="Updating NuGet package version info..." />
-		<FileUpdate Files="@(NuspecFiles)" Regex="\$version\$" ReplacementText="$(AssemblyVersion)" />
+		<GetSemanticVersion AssemblyVersion="$(AssemblyVersion)">
+			<Output TaskParameter="SemanticVersion" PropertyName="SemanticVersion" />
+		</GetSemanticVersion>
+		<FileUpdate Files="@(NuspecFiles)" Regex="\$version\$" ReplacementText="$(SemanticVersion)" />
 
 		<Message Text="Updating NuGet package dependency version info..." />
 		<GetNuGetDependencyVersions PackageInstallDirectory="$(PackageInstallDirectory)">
@@ -200,7 +187,7 @@
 
 		<Message Text="Packaging NuGet packages..." />
 		<Exec
-			Command="&quot;$(MSBuildProjectDirectory)\.nuget\nuget.exe&quot; pack %(NuspecFiles.Filename)%(NuspecFiles.Extension)"
+			Command="&quot;$(MSBuildProjectDirectory)\.nuget\nuget.exe&quot; pack %(NuspecFiles.Filename)%(NuspecFiles.Extension) -symbols"
 			WorkingDirectory="%(NuspecFiles.RootDir)%(NuspecFiles.Directory)" />
 		<ItemGroup>
 			<NupkgFiles Include="$(StagingDirectory)\**\*.nupkg" />
@@ -220,7 +207,7 @@
 		</ItemGroup>
 		<PropertyGroup>
 			<TestResultsFile>$(BuildDirectory)\log\TestResults.xml</TestResultsFile>
-			<NUnitCommandLineArgs>@(TestAssemblies->'%(FullPath)', ' ') /xml:$(TestResultsFile) /framework:net-4.0</NUnitCommandLineArgs>
+			<NUnitCommandLineArgs>@(TestAssemblies->'"%(FullPath)"', ' ') /xml:"$(TestResultsFile)" /framework:net-4.0</NUnitCommandLineArgs>
 		</PropertyGroup>
 		<MakeDir Directories="$(BuildDirectory)\log" Condition="!Exists('$(BuildDirectory)\log')" />
 		<Exec Command="&quot;%(NUnitConsole.FullPath)&quot; $(NUnitCommandLineArgs)" />
@@ -346,7 +333,7 @@
 					// Match package folders like Castle.Core.3.0.0.4001
 					// Groups[1] = "Castle.Core"
 					// Groups[2] = "3.0.0.4001"
-					var re = new Regex(@"^(.+?)\.([0-9\.]+)$");
+					var re = new Regex(@"^(.+?)\.(([0-9]+)[A-Za-z0-9\.\-]*)$");
 
 					try
 					{
@@ -371,6 +358,34 @@
 							returnItems.Add(item);
 						}
 						Dependencies = returnItems.ToArray();
+						return true;
+					}
+					catch(Exception ex)
+					{
+						Log.LogErrorFromException(ex);
+						return false;
+					}
+				]]>
+			</Code>
+		</Task>
+	</UsingTask>
+	<UsingTask TaskName="GetSemanticVersion" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+		<ParameterGroup>
+			<AssemblyVersion Required="true" />
+			<SemanticVersion ParameterType="System.String" Output="true" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System" />
+			<Using Namespace="Microsoft.Build.Framework" />
+			<Using Namespace="Microsoft.Build.Utilities" />
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+					try
+					{
+						// The package version is a three-digit X.Y.Z semantic
+						// version, not a four-digit assembly version, per semver.org.
+						var parsedVersion = new Version(AssemblyVersion);
+						SemanticVersion = String.Format("{0}.{1}.{2}", parsedVersion.Major, parsedVersion.Minor, parsedVersion.Build);
 						return true;
 					}
 					catch(Exception ex)

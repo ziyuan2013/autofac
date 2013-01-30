@@ -45,6 +45,10 @@ namespace Autofac.Features.Metadata
 
         public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<IComponentRegistration>> registrationAccessor)
         {
+            if (registrationAccessor == null)
+            {
+                throw new ArgumentNullException("registrationAccessor");
+            }
             var swt = service as IServiceWithType;
             if (swt == null || !swt.ServiceType.IsGenericTypeDefinedBy(typeof(Meta<>)))
                 return Enumerable.Empty<IComponentRegistration>();
@@ -70,7 +74,9 @@ namespace Autofac.Features.Metadata
             return MetaRegistrationSourceResources.MetaRegistrationSourceDescription;
         }
 
+        // ReSharper disable UnusedMember.Local
         static IComponentRegistration CreateMetaRegistration<T>(Service providedService, IComponentRegistration valueRegistration)
+        // ReSharper restore UnusedMember.Local
         {
             var rb = RegistrationBuilder
                 .ForDelegate((c, p) => new Meta<T>(

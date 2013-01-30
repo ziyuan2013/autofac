@@ -12,7 +12,7 @@
     <AssemblyName>Autofac.Extras.Multitenant</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\..\SharedKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\Build\SharedKey.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion Condition="$(TargetFrameworkVersion)==''">v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile Condition="$(TargetFrameworkVersion)==''">
     </TargetFrameworkProfile>
@@ -27,7 +27,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\..\Build\Full.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Debug\Autofac.Extras.Multitenant.xml</DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
@@ -38,13 +38,14 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\..\Build\Full.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\Autofac.Extras.Multitenant.xml</DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>..\..\..\packages\Castle.Core.3.0.0.4001\lib\net40-client\Castle.Core.dll</HintPath>
+    <Reference Include="Castle.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\Castle.Core.3.1.0\lib\net40-client\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -63,12 +64,15 @@
     <Compile Include="..\..\..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\SecurityAssemblyInfo.cs">
-      <Link>Properties\SecurityAssemblyInfo.cs</Link>
+    <Compile Include="..\..\..\ProductAssemblyInfo.cs">
+      <Link>Properties\ProductAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
+    <CodeAnalysisDictionary Include="..\..\..\Build\CodeAnalysisDictionary.xml">
+      <Link>CodeAnalysisDictionary.xml</Link>
+    </CodeAnalysisDictionary>
     <Compile Include="ConfigurationActionBuilder.cs" />
     <Compile Include="DefaultTenantId.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -81,12 +85,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RegistrationExtensions.cs" />
-    <Compile Include="Wcf\AutofacDependencyInjectionServiceBehavior.cs" />
-    <Compile Include="Wcf\AutofacHostFactory.cs" />
-    <Compile Include="Wcf\AutofacInstanceContext.cs" />
-    <Compile Include="Wcf\AutofacInstanceProvider.cs" />
-    <Compile Include="Wcf\AutofacServiceHostFactory.cs" />
-    <Compile Include="Wcf\AutofacWebServiceHostFactory.cs" />
     <Compile Include="Wcf\DynamicProxy\CustomAttributeDataExtensions.cs" />
     <Compile Include="Wcf\DynamicProxy\IgnoreAttributeInterfaceProxyInstanceContributor.cs" />
     <Compile Include="Wcf\DynamicProxy\ServiceHostInterfaceProxyGenerator.cs" />
@@ -95,17 +93,11 @@
     <Compile Include="Wcf\DynamicProxy\TypeExtensions.cs" />
     <Compile Include="Wcf\MultitenantServiceImplementationDataProvider.cs" />
     <Compile Include="Wcf\ServiceMetadataTypeAttribute.cs" />
-    <Compile Include="Wcf\SimpleServiceImplementationDataProvider.cs" />
-    <Compile Include="Wcf\IServiceImplementationDataProvider.cs" />
     <Compile Include="Wcf\OperationContextTenantIdentificationStrategy.cs" />
-    <Compile Include="Wcf\ServiceImplementationData.cs" />
     <Compile Include="Wcf\TenantIdentificationContextExtension.cs" />
     <Compile Include="Wcf\TenantPropagationBehavior.cs" />
     <Compile Include="Wcf\TenantPropagationMessageInspector.cs" />
     <Compile Include="Web\RequestParameterTenantIdentificationStrategy.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="CodeAnalysisDictionary.xml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -114,6 +106,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Source\Autofac.Integration.Wcf\Autofac.Integration.Wcf.csproj">
+      <Project>{4d5c02d1-c10a-4448-9d7b-8f2a5cca1d13}</Project>
+      <Name>Autofac.Integration.Wcf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Source\Autofac\Autofac.csproj">
       <Project>{7d018b3e-34a3-423d-ac35-12731f4e0a2c}</Project>
       <Name>Autofac</Name>

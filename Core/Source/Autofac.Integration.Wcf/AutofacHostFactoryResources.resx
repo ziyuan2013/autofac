@@ -123,6 +123,9 @@
   <data name="ImplementationTypeUnknown" xml:space="preserve">
     <value>Service '{0}' is registered in such a way that its implementation type could not be derived. This is required for WCF integration. Consider using a reflection-based registration or an expression-based registration where the return value is a class type. The current default registration is '{1}'.</value>
   </data>
+  <data name="NoServiceTypeToHost" xml:space="preserve">
+    <value>No type to host was provided by the '{0}' for the service '{1}'.</value>
+  </data>
   <data name="ServiceMustBeSingleInstance" xml:space="preserve">
     <value>The WCF service '{0}' has an InstanceContextMode of Single and is not registered as SingleInstance with the Autofac container.</value>
   </data>

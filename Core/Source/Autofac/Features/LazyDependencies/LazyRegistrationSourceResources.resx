@@ -120,7 +120,4 @@
   <data name="LazyRegistrationSourceDescription" xml:space="preserve">
     <value>Lazy&lt;T&gt; Support</value>
   </data>
-  <data name="LazyWithMetadataRegistrationSourceDescription" xml:space="preserve">
-    <value>Lazy&lt;T, TMetadata&gt; Support</value>
-  </data>
 </root>

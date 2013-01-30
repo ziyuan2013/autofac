@@ -93,15 +93,15 @@ namespace Autofac.Builder
         IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> InstancePerLifetimeScope();
 
         /// <summary>
-        /// Configure the component so that every dependent component or call to Resolve()
-        /// within a ILifetimeScope tagged with the provided tag value gets the same, shared instance.
+        /// Configure the component so that every dependent component or call to Resolve() within
+        /// a ILifetimeScope tagged with any of the provided tags value gets the same, shared instance.
         /// Dependent components in lifetime scopes that are children of the tagged scope will
         /// share the parent's instance. If no appropriately tagged scope can be found in the
         /// hierarchy an <see cref="DependencyResolutionException"/> is thrown.
         /// </summary>
         /// <param name="lifetimeScopeTag">Tag applied to matching lifetime scopes.</param>
         /// <returns>A registration builder allowing further configuration of the component.</returns>
-        IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> InstancePerMatchingLifetimeScope(object lifetimeScopeTag);
+        IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> InstancePerMatchingLifetimeScope(params object[] lifetimeScopeTag);
 
         /// <summary>
         /// Configure the component so that every dependent component or call to Resolve()
@@ -197,7 +197,7 @@ namespace Autofac.Builder
         /// <param name="serviceType">The service type provided by the component.</param>
         /// <returns>A registration builder allowing further configuration of the component.</returns>
         IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> Named(string serviceName, Type serviceType);
-        
+
         /// <summary>
         /// Provide a textual name that can be used to retrieve the component.
         /// </summary>
@@ -248,9 +248,9 @@ namespace Autofac.Builder
         /// Configure the component so that any properties whose types are registered in the
         /// container will be wired to instances of the appropriate service.
         /// </summary>
-        /// <param name="wiringFlags">Set wiring options such as circular dependency wiring support.</param>
+        /// <param name="options">Set wiring options such as circular dependency wiring support.</param>
         /// <returns>A registration builder allowing further configuration of the component.</returns>
-        IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> PropertiesAutowired(PropertyWiringFlags wiringFlags = PropertyWiringFlags.Default);
+        IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> PropertiesAutowired(PropertyWiringOptions options = PropertyWiringOptions.None);
 
         /// <summary>
         /// Associates data with the component.

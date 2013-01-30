@@ -43,14 +43,6 @@ namespace Autofac.Core
         readonly ILifetimeScope _rootLifetimeScope;
 
         /// <summary>
-        /// An empty container.
-        /// </summary>
-        public static Container Empty
-        {
-            get { return new Container(); }
-        }
-
-        /// <summary>
         /// Create a new container.
         /// </summary>
         internal Container()
@@ -59,7 +51,8 @@ namespace Autofac.Core
 
             _componentRegistry.Register(new ComponentRegistration(
                 LifetimeScope.SelfRegistrationId,
-                new DelegateActivator(typeof(LifetimeScope), (c, p) => {
+                new DelegateActivator(typeof(LifetimeScope), (c, p) =>
+                {
                     throw new InvalidOperationException(ContainerResources.SelfRegistrationCannotBeActivated);
                 }),
                 new CurrentScopeLifetime(),
@@ -212,7 +205,7 @@ namespace Autofac.Core
         /// A service object of type <paramref name="serviceType"/>.-or- null if there is 
         /// no service object of type <paramref name="serviceType"/>.
         /// </returns>
-        object IServiceProvider.GetService(Type serviceType)
+        public object GetService(Type serviceType)
         {
             return ((IServiceProvider)_rootLifetimeScope).GetService(serviceType);
         }

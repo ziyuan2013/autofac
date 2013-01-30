@@ -1,7 +1,9 @@
 # Build Output
 glob:*/bin/
+glob:*/Bin/
 glob:*/obj/
 glob:build_output
+Examples/Remember.Web/Content/DomainServicesExample.xap
 
 # Per-User Development Artifacts
 glob:*/_ReSharper*
@@ -22,3 +24,5 @@ glob:packages/Moq*
 glob:packages/NHibernate*
 glob:packages/NUnit*
 glob:packages/Unity*
+syntax: glob
+packages/*

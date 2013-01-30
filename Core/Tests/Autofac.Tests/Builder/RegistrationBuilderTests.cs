@@ -2,6 +2,7 @@
 using System.Linq;
 using Autofac.Builder;
 using Autofac.Core;
+using Autofac.Features.Metadata;
 using NUnit.Framework;
 
 namespace Autofac.Tests.Builder
@@ -9,23 +10,24 @@ namespace Autofac.Tests.Builder
     [TestFixture]
     public class RegistrationBuilderTests
     {
-        interface IProperties
+        class TestMetadata
         {
-            int A { get; }
-            string B { get; }
+            public int A { get; set; }
+            public string B { get; set; }
         }
 
         [Test]
-        public void WhenPropetyFromStronglyTypedInterfaceConfigured_ReflectedInComponentRegistration()
+        public void WhenPropetyFromStronglyTypedClassConfigured_ReflectedInComponentRegistration()
         {
             var builder = RegistrationBuilder.ForType<object>();
-            builder.WithMetadata<IProperties>(ep => ep
+            builder.WithMetadata<TestMetadata>(ep => ep
                 .For(p => p.A, 42)
                 .For(p => p.B, "hello"));
-            
+
             var reg = builder.CreateRegistration();
-            Assert.AreEqual(42, reg.Metadata["A"]);
-            Assert.AreEqual("hello", reg.Metadata["B"]);
+
+            Assert.That(reg.Metadata["A"], Is.EqualTo(42));
+            Assert.That(reg.Metadata["B"], Is.EqualTo("hello"));
         }
 
         [Test]
@@ -33,7 +35,7 @@ namespace Autofac.Tests.Builder
         {
             var builder = RegistrationBuilder.ForType<object>();
             Assert.Throws<ArgumentException>(() =>
-                builder.WithMetadata<IProperties>(ep => ep.For(p => 42, 42)));
+                builder.WithMetadata<TestMetadata>(ep => ep.For(p => 42, 42)));
         }
 
         [Test]

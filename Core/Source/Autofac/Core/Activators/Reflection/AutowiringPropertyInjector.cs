@@ -31,7 +31,7 @@ namespace Autofac.Core.Activators.Reflection
 {
     class AutowiringPropertyInjector
     {
-        public void InjectProperties(IComponentContext context, object instance, bool overrideSetValues)
+        public static void InjectProperties(IComponentContext context, object instance, bool overrideSetValues)
         {
             if (context == null) throw new ArgumentNullException("context");
             if (instance == null) throw new ArgumentNullException("instance");
@@ -45,6 +45,9 @@ namespace Autofac.Core.Activators.Reflection
                 var propertyType = property.PropertyType;
 
                 if (propertyType.IsValueType && !propertyType.IsEnum)
+                    continue;
+
+                if (propertyType.IsArray && propertyType.GetElementType().IsValueType)
                     continue;
 
                 if (property.GetIndexParameters().Length != 0)

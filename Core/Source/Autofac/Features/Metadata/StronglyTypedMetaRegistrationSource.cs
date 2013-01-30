@@ -25,7 +25,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reflection;
 using Autofac.Builder;
@@ -48,12 +47,19 @@ namespace Autofac.Features.Metadata
 
         public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<IComponentRegistration>> registrationAccessor)
         {
+            if (registrationAccessor == null)
+            {
+                throw new ArgumentNullException("registrationAccessor");
+            }
             var swt = service as IServiceWithType;
             if (swt == null || !swt.ServiceType.IsGenericTypeDefinedBy(typeof(Meta<,>)))
                 return Enumerable.Empty<IComponentRegistration>();
 
             var valueType = swt.ServiceType.GetGenericArguments()[0];
             var metaType = swt.ServiceType.GetGenericArguments()[1];
+
+            if (!metaType.IsClass)
+                return Enumerable.Empty<IComponentRegistration>();
 
             var valueService = swt.ChangeType(valueType);
 
@@ -81,8 +87,8 @@ namespace Autofac.Features.Metadata
         {
             var rb = RegistrationBuilder
                 .ForDelegate((c, p) => new Meta<T, TMetadata>(
-                                           (T)c.ResolveComponent(valueRegistration, p),
-                                           AttributedModelServices.GetMetadataView<TMetadata>(valueRegistration.Target.Metadata)))
+                    (T)c.ResolveComponent(valueRegistration, p),
+                    MetadataViewProvider.GetMetadataViewProvider<TMetadata>()(valueRegistration.Target.Metadata)))
                 .As(providedService)
                 .Targeting(valueRegistration);
 

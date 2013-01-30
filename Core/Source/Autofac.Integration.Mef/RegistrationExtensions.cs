@@ -28,7 +28,10 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Registration;
@@ -40,25 +43,74 @@ namespace Autofac.Integration.Mef
     /// </summary>
     public static class RegistrationExtensions
     {
+        /// <summary>
+        /// Reference to the internal <see cref="System.Type"/> for <c>System.ComponentModel.Composition.ContractNameServices</c>,
+        /// which is responsible for mapping types to MEF contract names.
+        /// </summary>
+        private static readonly Type _contractNameServices = typeof(ExportAttribute).Assembly.GetType("System.ComponentModel.Composition.ContractNameServices", true);
+
+        /// <summary>
+        /// Reference to the property <c>System.ComponentModel.Composition.ContractNameServices.TypeIdentityCache</c>,
+        /// which holds the dictionary of <see cref="System.Type"/> to <see cref="System.String"/> contract name mappings.
+        /// </summary>
+        private static readonly PropertyInfo _typeIdentityCache = _contractNameServices.GetProperty("TypeIdentityCache", BindingFlags.GetProperty | BindingFlags.Static | BindingFlags.NonPublic);
+        
         static IEnumerable<Service> DefaultExposedServicesMapper(ExportDefinition ed)
         {
             yield return MapService(ed);
         }
-    
+
         static Service MapService(ExportDefinition ed)
         {
+            /* Issue 326: MEF is string based, not type-based, so when an export and
+             * an import line up on contract (or type identity) it's always based on a
+             * generated contract name rather than an actual type. Usually the contract
+             * name and the type name are the same, just that the contract name is ONLY
+             * the type name without any assembly qualifier. However, when you get to
+             * generics, the type name gets mangled a bit. ITest<Foo> becomes ITest(Foo)
+             * with parens instead of angle brackets. If you have multiple types with the
+             * same name but in different assemblies, or nested types, things get even more
+             * mangled. For this reason, you have to access the internal type-to-contract
+             * map that MEF uses when building these items at runtime. Unfortunately, that's
+             * not publicly exposed so we have to use reflection to reverse the lookup.
+             *
+             * Note we tried doing something like...
+             * AppDomain.CurrentDomain.GetAssemblies()
+             *     .SelectMany(asm => asm.GetTypes())
+             *     .SingleOrDefault(t => AttributedModelServices.GetContractName(t) == exportTypeIdentity)
+             *
+             * But that doesn't work because when you enumerate the types in the assemblies
+             * you only get OPEN generics, and many types expose services that are CLOSED
+             * generics. That means the lambda above still won't find the service and things
+             * still won't get registered. */
             var ct = FindType(ed.ContractName);
             if (ct != null)
                 return new TypedService(ct);
 
             var et = FindType((string)ed.Metadata[CompositionConstants.ExportTypeIdentityMetadataName]);
-            return new KeyedService(ed.ContractName, et);
+            if(et != null)
+                return new KeyedService(ed.ContractName, et);
+
+            return null;
         }
 
         static Type FindType(string exportTypeIdentity)
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            return assemblies.Select(a => a.GetType(exportTypeIdentity, false)).SingleOrDefault(t => t != null);
+            var cache = (Dictionary<Type, string>)_typeIdentityCache.GetValue(null, null);
+            return cache.Where(kvp => kvp.Value == exportTypeIdentity).FirstOrDefault().Key;
+        }
+
+        /// <summary>
+        /// Registers the <see cref="LazyWithMetadataRegistrationSource"/> and 
+        /// <see cref="StronglyTypedMetaRegistrationSource"/> registration sources.
+        /// </summary>
+        /// <param name="builder">The container builder.</param>
+        public static void RegisterMetadataRegistrationSources(this ContainerBuilder builder)
+        {
+            if (builder == null) throw new ArgumentNullException("builder");
+
+            builder.RegisterSource(new LazyWithMetadataRegistrationSource());
+            builder.RegisterSource(new StronglyTypedMetaRegistrationSource());
         }
 
         /// <summary>
@@ -219,7 +271,7 @@ namespace Autofac.Integration.Mef
                     })
                     .As(exportId, contractService)
                     .ExternallyOwned()
-                    .WithMetadata(exportDef.Metadata);
+                    .WithMetadata((IEnumerable<KeyValuePair<string, object>>)exportDef.Metadata);
 
                 var additionalServices = exposedServicesMapper(exportDef).ToArray();
 
@@ -228,7 +280,7 @@ namespace Autofac.Integration.Mef
                     builder.Register(c => ((Export)c.ResolveService(exportId)).Value)
                         .As(additionalServices)
                         .ExternallyOwned()
-                        .WithMetadata(exportDef.Metadata);
+                        .WithMetadata((IEnumerable<KeyValuePair<string, object>>)exportDef.Metadata);
                 }
             }
         }
@@ -288,6 +340,7 @@ namespace Autofac.Integration.Mef
             return true;
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "The component registry is responsible for disposal of contained registrations.")]
         static void AttachExport(IComponentRegistry registry, IComponentRegistration registration, ExportConfigurationBuilder exportConfiguration)
         {
             var contractService = new ContractBasedService(exportConfiguration.ContractName, exportConfiguration.ExportTypeIdentity);
@@ -301,7 +354,7 @@ namespace Autofac.Integration.Mef
                 })
                 .As(contractService)
                 .ExternallyOwned()
-                .WithMetadata(exportConfiguration.Metadata);
+                .WithMetadata((IEnumerable<KeyValuePair<string, object>>)exportConfiguration.Metadata);
 
             registry.Register(rb.CreateRegistration());
         }
@@ -325,7 +378,7 @@ namespace Autofac.Integration.Mef
             {
                 var cbid = import as ContractBasedImportDefinition;
                 if (cbid == null)
-                    throw new NotSupportedException(string.Format(RegistrationExtensionsResources.ContractBasedOnly, import));
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, RegistrationExtensionsResources.ContractBasedOnly, import));
 
                 var exportsForContract = context.ResolveExports(cbid);
                 composablePart.SetImport(import, exportsForContract);

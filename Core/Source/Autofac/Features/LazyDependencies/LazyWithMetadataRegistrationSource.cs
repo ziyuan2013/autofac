@@ -25,17 +25,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Reflection;
 using Autofac.Builder;
 using Autofac.Core;
+using Autofac.Features.Metadata;
 using Autofac.Util;
 
 namespace Autofac.Features.LazyDependencies
 {
     /// <summary>
-    /// Support the <see cref="System.Lazy{T, TMetadata}"/>
+    /// Support the <c>System.Lazy&lt;T, TMetadata&gt;</c>
     /// types automatically whenever type T is registered with the container.
     /// Metadata values come from the component registration's metadata.
     /// When a dependency of a lazy type is used, the instantiation of the underlying
@@ -50,12 +50,20 @@ namespace Autofac.Features.LazyDependencies
 
         public IEnumerable<IComponentRegistration> RegistrationsFor(Service service, Func<Service, IEnumerable<IComponentRegistration>> registrationAccessor)
         {
+            if (registrationAccessor == null)
+            {
+                throw new ArgumentNullException("registrationAccessor");
+            }
             var swt = service as IServiceWithType;
-            if (swt == null || !swt.ServiceType.IsGenericTypeDefinedBy(typeof(Lazy<,>)))
+            var lazyType = GetLazyType(swt);
+            if (swt == null || lazyType == null || !swt.ServiceType.IsGenericTypeDefinedBy(lazyType))
                 return Enumerable.Empty<IComponentRegistration>();
 
             var valueType = swt.ServiceType.GetGenericArguments()[0];
             var metaType = swt.ServiceType.GetGenericArguments()[1];
+
+            if (!metaType.IsClass)
+                return Enumerable.Empty<IComponentRegistration>();
 
             var valueService = swt.ChangeType(valueType);
 
@@ -74,7 +82,7 @@ namespace Autofac.Features.LazyDependencies
 
         public override string ToString()
         {
-            return LazyRegistrationSourceResources.LazyWithMetadataRegistrationSourceDescription;
+            return LazyWithMetadataRegistrationSourceResources.LazyWithMetadataRegistrationSourceDescription;
         }
 
         // ReSharper disable UnusedMember.Local
@@ -85,14 +93,25 @@ namespace Autofac.Features.LazyDependencies
                 (c, p) =>
                 {
                     var context = c.Resolve<IComponentContext>();
-                    return new Lazy<T, TMeta>(
-                        () => (T) context.ResolveComponent(valueRegistration, p),
-                        AttributedModelServices.GetMetadataView<TMeta>(valueRegistration.Target.Metadata));
+                    var lazyType = ((IServiceWithType)providedService).ServiceType;
+                    var valueFactory = new Func<T>(() => (T)context.ResolveComponent(valueRegistration, p));
+                    var metadataProvider = MetadataViewProvider.GetMetadataViewProvider<TMeta>();
+                    var metadata = metadataProvider(valueRegistration.Target.Metadata);
+                    return Activator.CreateInstance(lazyType, valueFactory, metadata);
                 })
                 .As(providedService)
                 .Targeting(valueRegistration);
 
             return rb.CreateRegistration();
+        }
+
+        static Type GetLazyType(IServiceWithType serviceWithType)
+        {
+            return serviceWithType != null
+                   && serviceWithType.ServiceType.IsGenericType
+                   && serviceWithType.ServiceType.GetGenericTypeDefinition().FullName == "System.Lazy`2"
+                       ? serviceWithType.ServiceType.GetGenericTypeDefinition()
+                       : null;
         }
     }
 }

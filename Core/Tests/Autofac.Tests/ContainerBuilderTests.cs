@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Autofac.Builder;
 using Autofac.Features.Indexed;
 using Autofac.Tests.Scenarios.ScannedAssembly;
@@ -140,6 +139,8 @@ namespace Autofac.Tests
             Assert.IsTrue(container.IsRegistered<object>());
         }
 
+#if !WINDOWS_PHONE
+
         [Test]
         public void RegisterAssemblyModules()
         {
@@ -153,7 +154,7 @@ namespace Autofac.Tests
         }
 
         [Test]
-        public void RegisterAssemblyModulesOfType()
+        public void RegisterAssemblyModulesOfGenericType()
         {
             var assembly = typeof(AComponent).Assembly;
             var builder = new ContainerBuilder();
@@ -163,6 +164,43 @@ namespace Autofac.Tests
             Assert.That(container.IsRegistered<AComponent>(), Is.True);
             Assert.That(container.IsRegistered<BComponent>(), Is.False);
         }
+
+        [Test]
+        public void RegisterAssemblyModulesOfBaseGenericType()
+        {
+            var assembly = typeof(AComponent).Assembly;
+            var builder = new ContainerBuilder();
+            builder.RegisterAssemblyModules<ModuleBase>(assembly);
+            var container = builder.Build();
+
+            Assert.That(container.IsRegistered<AComponent>(), Is.True);
+            Assert.That(container.IsRegistered<BComponent>(), Is.True);
+        }
+
+        [Test]
+        public void RegisterAssemblyModulesOfType()
+        {
+            var assembly = typeof(AComponent).Assembly;
+            var builder = new ContainerBuilder();
+            builder.RegisterAssemblyModules(typeof(AModule), assembly);
+            var container = builder.Build();
+
+            Assert.That(container.IsRegistered<AComponent>(), Is.True);
+            Assert.That(container.IsRegistered<BComponent>(), Is.False);
+        }
+
+        [Test]
+        public void RegisterAssemblyModulesOfBaseType()
+        {
+            var assembly = typeof(AComponent).Assembly;
+            var builder = new ContainerBuilder();
+            builder.RegisterAssemblyModules(typeof(ModuleBase), assembly);
+            var container = builder.Build();
+
+            Assert.That(container.IsRegistered<AComponent>(), Is.True);
+            Assert.That(container.IsRegistered<BComponent>(), Is.True);
+        }
+#endif
 
         [Test]
         [ExpectedException(typeof(InvalidOperationException))]
@@ -212,7 +250,7 @@ namespace Autofac.Tests
             var key = new object();
 
             var cb = new ContainerBuilder();
-            cb.RegisterType<object>().Keyed<object>( key );
+            cb.RegisterType<object>().Keyed<object>(key);
 
             var c = cb.Build();
 
@@ -346,36 +384,6 @@ namespace Autofac.Tests
             Assert.AreSame(b, c);
         }
 
-        [Test]
-        public void DefaultsPreservedWhenSpecified()
-        {
-            var builder = new ContainerBuilder();
-            builder.RegisterInstance("s1");
-            builder.RegisterInstance("s2").PreserveExistingDefaults();
-            var container = builder.Build();
-            Assert.AreEqual("s1", container.Resolve<string>());
-        }
-
-        [Test]
-        public void WhenNoDefaultNewRegistrationIsAvailable()
-        {
-            var builder = new ContainerBuilder();
-            builder.RegisterInstance("s2").PreserveExistingDefaults();
-            var container = builder.Build();
-            Assert.AreEqual("s2", container.Resolve<string>());
-        }
-
-        [Test, Ignore("#272")]
-        public void DefaultsPreservedInNestedScope()
-        {
-            var builder = new ContainerBuilder();
-            builder.RegisterInstance("s1");
-            var container = builder.Build();
-            var scope = container.BeginLifetimeScope(b => 
-                b.RegisterInstance("s2").PreserveExistingDefaults());
-
-            Assert.AreEqual("s1", scope.Resolve<string>());
-        }
 
         [Test]
         public void InContextSpecifiesContainerScope()
@@ -485,7 +493,7 @@ namespace Autofac.Tests
         [Test]
         public void WhenTheContainerIsBuilt_StartableComponentsAreStarted()
         {
-            const ContainerBuildOptions buildOptions = ContainerBuildOptions.Default;
+            const ContainerBuildOptions buildOptions = ContainerBuildOptions.None;
             var started = WasStartInvoked(buildOptions);
             Assert.IsTrue(started);
         }

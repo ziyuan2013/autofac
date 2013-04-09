@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -135,14 +136,25 @@ namespace Autofac.Util
                        .Any(p => ParameterEqualsConstraint(p, constraint));
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1031", Justification = "Implementing a real TryMakeGenericType is not worth the effort.")]
         static bool ParameterEqualsConstraint(Type parameter, Type constraint)
         {
             var genericArguments = parameter.GetGenericArguments();
             if (genericArguments.Length > 0 && constraint.IsGenericType)
             {
                 var typeDefinition = constraint.GetGenericTypeDefinition();
-                var genericType = typeDefinition.MakeGenericType(genericArguments);
-                return genericType == parameter;
+                if (typeDefinition.GetGenericArguments().Length == genericArguments.Length)
+                {
+                    try
+                    {
+                        var genericType = typeDefinition.MakeGenericType(genericArguments);
+                        return genericType == parameter;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
             }
             return false;
         }
